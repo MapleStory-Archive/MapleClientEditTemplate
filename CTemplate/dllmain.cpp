@@ -8,6 +8,7 @@
 #include "hooker.h"
 #include "Common.h"
 #include "winhooks.h"
+#include "ExampleHooks.h"
 
 // BE AWARE ===v
 // in order to fix the detours.lib link error you need to replace
@@ -21,7 +22,31 @@ VOID MainFunc()
 {
 	Log(__FUNCTION__);
 
-	// paste all your edits in here
+	// set hooks
+
+	INITMAPLEHOOK(
+		_ExampleFunc_cdecl, // pointer to original function
+		_ExampleFunc_cdecl_t, // function type
+		MapleHooks::ExampleCDecl_Hook, // function to detour to
+		0x0 // maple address
+	);
+
+	INITMAPLEHOOK(
+		_ExampleFunc_thiscall, // pointer to original function
+		_ExampleFunc_thiscall_t, // function type
+		MapleHooks::ExampleFunc_thiscall2, // function to detour to
+		0x0 // maple address
+	);
+
+	// edit memory
+
+	WriteValue<BYTE>(0x0, 0xEB); // address to write to, value to write
+	WriteValue<DWORD>(0x0, 0x42069);
+	WriteValue<double>(0x0, 420.69);
+
+	PatchNop(0x0, 6); // address to write to, number of nops
+
+	PatchRetZero(0x0); // function start address to return zero at
 }
 
 // prolly don't edit this region if youre a noob

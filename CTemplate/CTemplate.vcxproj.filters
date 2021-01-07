@@ -27,6 +27,12 @@
     <ClInclude Include="ijl15.h">
       <Filter>Proxy</Filter>
     </ClInclude>
+    <ClInclude Include="MapleAPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ExampleHooks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -37,6 +43,12 @@
     </ClCompile>
     <ClCompile Include="ijl15.cpp">
       <Filter>Proxy</Filter>
+    </ClCompile>
+    <ClCompile Include="MapleAPI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ExampleHooks.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

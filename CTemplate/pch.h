@@ -10,7 +10,7 @@
 // add headers that you want to pre-compile here
 #include "framework.h"
 #include "commonconfig.h"
-
-#pragma comment(lib, "detours.lib")
+#include "MapleAPI.h"
+#include "logger.h"
 
 #endif //PCH_H
