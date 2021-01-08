@@ -1,10 +1,12 @@
 #pragma once
 #include <Windows.h>
 #include <stdlib.h>
-#include <malloc.h>
+
+// thanks raj for some of these
 
 #define relative_address(frm, to) (int)(((int)to - (int)frm) - 5)
 
+#define x86CMPEAX 0x3D
 #define x86XOR 0x33
 #define x86EAXEAX 0xC0
 #define x86RET 0xC3
@@ -48,11 +50,8 @@ static VOID WriteBytes(DWORD dwAddress, const char* pData, UINT nCount)
 	memcpy((PVOID)dwAddress, pData, nCount);
 }
 
-static PCHAR ReadBytes(DWORD dwAddress, UINT nLen)
+template <typename T>
+static T ReadValue(DWORD dwAddr)
 {
-	char* aRet = (char*)malloc(nLen);
-
-	memcpy(aRet, (PVOID)dwAddress, nLen);
-
-	return aRet;
+	return *((T*)dwAddr);
 }

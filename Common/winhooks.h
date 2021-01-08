@@ -6,6 +6,7 @@
 #include <intrin.h>
 #include "hooker.h"
 #include "logger.h"
+#include "memedit.h"
 
 // fix returnaddress func
 // https://docs.microsoft.com/en-us/cpp/intrinsics/returnaddress?view=msvc-160
@@ -153,7 +154,7 @@ RegCreateKeyExA_t RegCreateKeyExA_Original;
 
 #pragma endregion
 
-bool g_bMutexTriggered = false;
+bool g_bThemidaUnpacked = false;
 
 SOCKET			g_GameSock;
 WSPPROC_TABLE	g_ProcTable;
@@ -170,9 +171,9 @@ const char* g_sOriginalIP;
 /// </summary>
 static VOID OnThemidaUnpack()
 {
-	if (g_bMutexTriggered) return;
+	if (g_bThemidaUnpacked) return;
 
-	g_bMutexTriggered = TRUE;
+	g_bThemidaUnpacked = TRUE;
 
 	if (MAPLETRACKING_SLEEP_ON_UNPACK)
 	{
@@ -255,19 +256,20 @@ static BOOL WINAPI CreateProcessW_Hook(
 	LPPROCESS_INFORMATION lpProcessInformation
 )
 {
-	if (lpApplicationName)
+	if (MAPLETRACKING_CREATE_PROCESS)
 	{
-		Log("CreateProcessW -> %s", lpApplicationName);
-	}
-	else
-	{
-		Log("CreateProcessW -> Null Application Name");
+		auto sAppName = lpApplicationName ? lpApplicationName : L"Null App Name";
+		auto sArgs = lpCommandLine ? lpCommandLine : L"Null Args";
+
+		Log("CreateProcessW -> %s : %s", sAppName, sArgs);
 	}
 
-	return CreateProcessW_Original(lpApplicationName, lpCommandLine,
-		lpProcessAttributes, lpThreadAttributes, bInheritHandles,
-		dwCreationFlags, lpEnvironment, lpCurrentDirectory,
-		lpStartupInfo, lpProcessInformation);
+	return CreateProcessW_Original(
+		lpApplicationName, lpCommandLine, lpProcessAttributes,
+		lpThreadAttributes, bInheritHandles, dwCreationFlags,
+		lpEnvironment, lpCurrentDirectory, lpStartupInfo,
+		lpProcessInformation
+	);
 }
 
 /// <summary>
@@ -287,19 +289,14 @@ static BOOL WINAPI CreateProcessA_Hook(
 {
 	if (MAPLETRACKING_CREATE_PROCESS)
 	{
-		if (lpApplicationName)
-		{
-			Log("CreateProcessA -> %s", lpApplicationName);
-		}
-		else
-		{
-			Log("CreateProcessA -> Null Application Name");
-		}
+		auto sAppName = lpApplicationName ? lpApplicationName : "Null App Name";
+		auto sArgs = lpCommandLine ? lpCommandLine : "Null Args";
+
+		Log("CreateProcessA -> %s : %s", sAppName, sArgs);
 	}
 
-	if (!lpApplicationName && MAPLE_KILL_EXIT_WINDOW && strstr(lpCommandLine, MAPLE_KILL_EXIT_WINDOW))
+	if (MAPLE_KILL_EXIT_WINDOW && strstr(lpCommandLine, MAPLE_KILL_EXIT_WINDOW))
 	{
-		Log("Killing web request to: %s", lpApplicationName);
 		Log("[CreateProcessA] [%08X] Killing web request to: %s", _ReturnAddress(), lpApplicationName);
 		return FALSE; // ret value doesn't get used by maple after creating web requests as far as i can tell
 	}
@@ -345,21 +342,38 @@ static HANDLE WINAPI OpenProcess_Hook(
 /// This library call is used by nexon to determine the locale of the connecting clients PC. We spoof it.
 /// </summary>
 /// <returns></returns>
-static UINT WINAPI GetACP_Hook() // AOB: FF 15 ?? ?? ?? ?? 3D 6A 03 00 00 74
+static UINT WINAPI GetACP_Hook() // AOB: FF 15 ?? ?? ?? ?? 3D ?? ?? ?? 00 00 74 <- library call inside winmain func
 {
-	if (MAPLE_LOCALE_SPOOF == 0) return GetACP_Original(); // should not happen cuz we dont hook if value is zero
+	if (!MAPLE_LOCALE_SPOOF) return GetACP_Original(); // should not happen cuz we dont hook if value is zero
 
-	if (g_bMutexTriggered)
+	UINT uiNewLocale = MAPLE_LOCALE_SPOOF;
+
+	// we dont wanna unhook until after themida is unpacked
+	// because if themida isn't unpacked then the call we are intercepting is not from maple
+	if (g_bThemidaUnpacked)
 	{
-		Log("Locale spoofed, unhooking. Calling address: %02x", _ReturnAddress());
+		DWORD dwRetAddr = reinterpret_cast<DWORD>(_ReturnAddress());
+
+		// return address should be a cmp eax instruction because ret value is stored in eax
+		// and nothing else should happen before the cmp
+		if (ReadValue<BYTE>(dwRetAddr) == x86CMPEAX)
+		{
+			uiNewLocale = ReadValue<DWORD>(dwRetAddr + 1); // check value is always 4 bytes
+
+			Log("[GetACP] Found desired locale: %d", uiNewLocale);
+		}
+		else
+		{
+			Log("[GetACP] Unable to automatically determine locale, using stored locale: %d", uiNewLocale);
+		}
+
+		Log("[GetACP] Locale spoofed to %d, unhooking. Calling address: %08X", uiNewLocale, dwRetAddr);
 
 		if (!SetHook(FALSE, reinterpret_cast<void**>(&GetACP_Original), GetACP_Hook))
 		{
 			Log("Failed to unhook GetACP.");
 		}
 	}
-
-	const UINT uiNewLocale = MAPLE_LOCALE_SPOOF; // thai
 
 	return uiNewLocale;
 }

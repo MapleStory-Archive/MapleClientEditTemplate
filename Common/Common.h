@@ -56,6 +56,7 @@ public:
 		{
 			INITWINHOOK("KERNEL32", "RegCreateKeyExA", RegCreateKeyExA_Original, RegCreateKeyExA_t, RegCreateKeyExA_Hook);
 		}
+
 		if (!bHookWinLibs) return;
 
 		if (!sIP || !sOriginalIP)

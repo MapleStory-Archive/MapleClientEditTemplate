@@ -30,9 +30,6 @@
     <ClInclude Include="commonconfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="memedit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ZXString.h">
       <Filter>Header Files\MapleTypes</Filter>
     </ClInclude>
@@ -62,6 +59,9 @@
     </ClInclude>
     <ClInclude Include="Common.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="memedit.h">
+      <Filter>Header Files\Tools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
