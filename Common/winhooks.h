@@ -162,6 +162,28 @@ const char* g_sRedirectIP;
 const char* g_sOriginalIP;
 
 /// <summary>
+/// Function called from library hooks.
+/// Most of the time this should be triggered by the Mutex hook, however, in the case that
+/// the Mutex hook does not get triggered then this will be executed by CreateWindowExA
+/// for redundancy. The contents of this function will only be executed once, even if both 
+/// Mutex and CreateWindow hooks are called properly.
+/// </summary>
+static VOID OnThemidaUnpack()
+{
+	if (g_bMutexTriggered) return;
+
+	g_bMutexTriggered = TRUE;
+
+	if (MAPLETRACKING_SLEEP_ON_UNPACK)
+	{
+		Log("Themida unpacked => sleeping for %d milliseconds.", MAPLETRACKING_SLEEP_ON_UNPACK);
+		Sleep(MAPLETRACKING_SLEEP_ON_UNPACK);
+	}
+
+	g_PostMutexFunc();
+}
+
+/// <summary>
 /// CreateMutexA is the first Windows library call after the executable unpacks itself.
 /// We hook this function to do all our memory edits and hooks when it's called.
 /// </summary>
@@ -179,22 +201,14 @@ static HANDLE WINAPI CreateMutexA_Hook(
 	}
 	else if (lpName && strstr(lpName, MAPLE_MUTEX))
 	{
-		if (MAPLETRACKING_SLEEP_ON_MUTEX)
-		{
-			Log("Mutex triggered => sleeping for %d milliseconds.", MAPLETRACKING_SLEEP_ON_MUTEX);
-			Sleep(MAPLETRACKING_SLEEP_ON_MUTEX);
-		}
-
 		Log("Mutex spoofed, unhooking..");
-
-		g_PostMutexFunc();
-
-		g_bMutexTriggered = true;
 
 		if (!SetHook(FALSE, reinterpret_cast<void**>(&CreateMutexA_Original), CreateMutexA_Hook))
 		{
 			Log("Failed to unhook mutex.");
 		}
+
+		OnThemidaUnpack();
 
 		return CreateMutexA_Original(lpMutexAttributes, bInitialOwner, lpName);
 	}
@@ -371,6 +385,9 @@ static HWND WINAPI CreateWindowExA_Hook(
 	if (MAPLE_PATCHER_CLASS && strstr(lpClassName, MAPLE_PATCHER_CLASS))
 	{
 		Log("Bypassing patcher window..");
+
+		OnThemidaUnpack();
+
 		return NULL;
 	}
 	else
@@ -380,6 +397,8 @@ static HWND WINAPI CreateWindowExA_Hook(
 			dwExStyle = 0;
 			dwStyle = 0xCA0000;
 		}
+
+		OnThemidaUnpack();
 
 		return CreateWindowExA_Original(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
 	}

@@ -65,7 +65,7 @@ public:
 		}
 
 		g_sRedirectIP = sIP;
-		sOriginalIP = sOriginalIP;
+		g_sOriginalIP = sOriginalIP;
 
 		// macro outputs error if hook fails
 		INITWINHOOK("MSWSOCK", "WSPStartup", WSPStartup_Original, WSPStartup_t, WSPStartup_Hook);
