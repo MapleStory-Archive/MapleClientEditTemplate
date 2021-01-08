@@ -50,7 +50,7 @@ BOOL g_InitIjl15 = InitializeIjl15(); //This is the static initializer !!!
 
 LIB_EXPORT void ijlGetLibVersion()
 {
-	__asm	jmp dword ptr[ijlGetLibVersion_Proc]
+	__asm	jmp dword ptr[ijlGetLibVersion_Proc] // make sure you're compiling in x86
 }
 
 LIB_EXPORT void ijlInit()

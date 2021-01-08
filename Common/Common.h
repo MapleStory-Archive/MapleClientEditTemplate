@@ -27,9 +27,14 @@ public:
 		{
 			INITWINHOOK("KERNEL32", "OpenProcess", OpenProcess_Original, OpenProcess_t, OpenProcess_Hook);
 		}
-		if (MAPLETRACKING_CREATE_PROCW)
+		if (MAPLETRACKING_CREATE_PROCESS)
 		{
 			INITWINHOOK("KERNEL32", "CreateProcessW", CreateProcessW_Original, CreateProcessW_t, CreateProcessW_Hook);
+			INITWINHOOK("KERNEL32", "CreateProcessA", CreateProcessA_Original, CreateProcessA_t, CreateProcessA_Hook);
+		}
+		else if (MAPLE_KILL_EXIT_WINDOW)
+		{
+			INITWINHOOK("KERNEL32", "CreateProcessA", CreateProcessA_Original, CreateProcessA_t, CreateProcessA_Hook);
 		}
 		if (MAPLETRACKING_OPEN_MUTEXA)
 		{
@@ -47,9 +52,10 @@ public:
 		{
 			INITWINHOOK("USER32", "CreateWindowExA", CreateWindowExA_Original, CreateWindowExA_t, CreateWindowExA_Hook)
 		}
-
-		INITWINHOOK("KERNEL32", "RegCreateKeyExA", RegCreateKeyExA_Original, RegCreateKeyExA_t, RegCreateKeyExA_Hook);
-
+		if (MAPLETRACKING_REGCREATEKEY)
+		{
+			INITWINHOOK("KERNEL32", "RegCreateKeyExA", RegCreateKeyExA_Original, RegCreateKeyExA_t, RegCreateKeyExA_Hook);
+		}
 		if (!bHookWinLibs) return;
 
 		if (!sIP || !sOriginalIP)

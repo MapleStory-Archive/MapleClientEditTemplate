@@ -68,6 +68,23 @@ typedef BOOL(WINAPI* CreateProcessW_t)(
 CreateProcessW_t CreateProcessW_Original;
 
 /// <summary>
+/// https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessa
+/// </summary>
+typedef BOOL(WINAPI* CreateProcessA_t)(
+	LPCSTR                lpApplicationName,
+	LPSTR                 lpCommandLine,
+	LPSECURITY_ATTRIBUTES lpProcessAttributes,
+	LPSECURITY_ATTRIBUTES lpThreadAttributes,
+	BOOL                  bInheritHandles,
+	DWORD                 dwCreationFlags,
+	LPVOID                lpEnvironment,
+	LPCSTR                lpCurrentDirectory,
+	LPSTARTUPINFOA        lpStartupInfo,
+	LPPROCESS_INFORMATION lpProcessInformation
+	);
+CreateProcessA_t CreateProcessA_Original;
+
+/// <summary>
 /// https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-openprocess
 /// </summary>
 typedef HANDLE(WINAPI* OpenProcess_t)(DWORD dwDesiredAccess, BOOL bInheritHandle, DWORD dwProcessId);
@@ -240,6 +257,48 @@ static BOOL WINAPI CreateProcessW_Hook(
 }
 
 /// <summary>
+/// Used same as above and also to kill/redirect some web requests.
+/// </summary>
+static BOOL WINAPI CreateProcessA_Hook(
+	LPCSTR                lpApplicationName,
+	LPSTR                 lpCommandLine,
+	LPSECURITY_ATTRIBUTES lpProcessAttributes,
+	LPSECURITY_ATTRIBUTES lpThreadAttributes,
+	BOOL                  bInheritHandles,
+	DWORD                 dwCreationFlags,
+	LPVOID                lpEnvironment,
+	LPCSTR                lpCurrentDirectory,
+	LPSTARTUPINFOA        lpStartupInfo,
+	LPPROCESS_INFORMATION lpProcessInformation)
+{
+	if (MAPLETRACKING_CREATE_PROCESS)
+	{
+		if (lpApplicationName)
+		{
+			Log("CreateProcessA -> %s", lpApplicationName);
+		}
+		else
+		{
+			Log("CreateProcessA -> Null Application Name");
+		}
+	}
+
+	if (!lpApplicationName && MAPLE_KILL_EXIT_WINDOW && strstr(lpCommandLine, MAPLE_KILL_EXIT_WINDOW))
+	{
+		Log("Killing web request to: %s", lpApplicationName);
+		Log("[CreateProcessA] [%08X] Killing web request to: %s", _ReturnAddress(), lpApplicationName);
+		return FALSE; // ret value doesn't get used by maple after creating web requests as far as i can tell
+	}
+
+	return CreateProcessA_Original(
+		lpApplicationName, lpCommandLine, lpProcessAttributes,
+		lpThreadAttributes, bInheritHandles, dwCreationFlags,
+		lpEnvironment, lpCurrentDirectory, lpStartupInfo,
+		lpProcessInformation
+	);
+}
+
+/// <summary>
 /// Same as CreateProcessW
 /// </summary>
 static HANDLE WINAPI CreateThread_Hook(
@@ -355,7 +414,7 @@ static LSTATUS WINAPI RegCreateKeyExA_Hook(
 	LPDWORD                     lpdwDisposition
 )
 {
-	//Log("Return address: %d", _ReturnAddress());
+	Log("RegCreateKeyExA - Return address: %d", _ReturnAddress());
 
 	return RegCreateKeyExA_Original(hKey, lpSubKey, Reserved, lpClass, dwOptions, samDesired, lpSecurityAttributes, phkResult, lpdwDisposition);
 }

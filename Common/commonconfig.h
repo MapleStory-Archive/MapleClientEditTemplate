@@ -15,6 +15,7 @@
 
 #define MAPLE_INSTAJECT			FALSE				// if true dll will immediately edit memory after injecting (when target exe is unvirtualized)
 #define MAPLE_FORCE_WINDOWED	TRUE				// force windowed login screen
+#define MAPLE_KILL_EXIT_WINDOW	"http"				// string to check against when killing browser startup windows
 #define MAPLE_WINDOW_CLASS		"MapleStoryClass"	// maple window class name -- don't need to change in most cases -- used to force minimized startup window
 #define MAPLE_PATCHER_CLASS		"StartUpDlgClass"	// name of patcher dialog window to skip -- set to null if none or don't want to skip
 #define MAPLE_MUTEX				"WvsClientMtx"		// name of client mutex -- this is usually WvsClientMtx but might be different in higher versions
@@ -24,6 +25,7 @@
 #define MAPLETRACKING_WSPCONN_PRINT		FALSE	// print all wspconnect requests -- useful for finding maple IPs
 #define MAPLETRACKING_NT_TERMINATE_PROC TRUE	// hook and log NtTerminateProc
 #define MAPLETRACKING_OPEN_PROC			TRUE	// hook and log OpenProcess
-#define MAPLETRACKING_CREATE_PROCW		TRUE	// hook and log CreateProcessW
+#define MAPLETRACKING_CREATE_PROCESS	TRUE	// hook and log CreateProcess(A&W)
 #define MAPLETRACKING_OPEN_MUTEXA		TRUE	// hook, log, and spoof OpenMutexA
+#define MAPLETRACKING_REGCREATEKEY		TRUE	// hook and log regcreatekey values
 #define MAPLETRACKING_SLEEP_ON_MUTEX	0		// number of seconds to sleep when mutex is triggered (0 for nothing) 
