@@ -26,4 +26,5 @@
 #define MAPLETRACKING_CREATE_PROCESS	TRUE	// hook and log CreateProcess(A&W)
 #define MAPLETRACKING_OPEN_MUTEXA		TRUE	// hook, log, and spoof OpenMutexA
 #define MAPLETRACKING_REGCREATEKEY		TRUE	// hook and log regcreatekey values
+#define MAPLETRACKING_GETPROCADDR		FALSE	// hook and log getprocaddr strings. logs all calls from the calling address after mutex is triggered, then it unhooks itself
 #define MAPLETRACKING_SLEEP_ON_UNPACK	0		// number of seconds to sleep when first library call after themida unpacking is triggered (0 for nothing) 

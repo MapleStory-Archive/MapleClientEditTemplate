@@ -28,6 +28,12 @@ PostMutexFunc_t g_PostMutexFunc;
 #pragma region LibraryDefs
 
 /// <summary>
+/// https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-getprocaddress
+/// </summary>
+typedef FARPROC(WINAPI* GetProcAddress_t)(HMODULE hModule, LPCSTR lpProcName);
+GetProcAddress_t GetProcAddress_Original;
+
+/// <summary>
 /// https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-createmutexa
 /// </summary>
 typedef HANDLE(WINAPI* CreateMutexA_t)(LPSECURITY_ATTRIBUTES lpMutexAttributes, BOOL bInitialOwner, LPCSTR lpName);
@@ -156,6 +162,8 @@ RegCreateKeyExA_t RegCreateKeyExA_Original;
 
 bool g_bThemidaUnpacked = false;
 
+DWORD g_dwGetProcRetAddr = 0;
+
 SOCKET			g_GameSock;
 WSPPROC_TABLE	g_ProcTable;
 
@@ -182,6 +190,42 @@ static VOID OnThemidaUnpack()
 	}
 
 	g_PostMutexFunc();
+}
+
+/// <summary>
+/// Used to map out imports used by MapleStory.
+/// The log output can be used to reconstruct the _ZAPIProcAddress struct
+/// ZAPI struct is the dword before the while loop when searching for aob: 68 FE 00 00 00 ?? 8D
+/// </summary>
+static FARPROC WINAPI GetProcAddress_Hook(HMODULE hModule, LPCSTR lpProcName)
+{
+	if (g_bThemidaUnpacked)
+	{
+		DWORD dwRetAddr = reinterpret_cast<DWORD>(_ReturnAddress());
+
+		if (!g_dwGetProcRetAddr)
+		{
+			g_dwGetProcRetAddr = dwRetAddr;
+
+			Log("[GetProcAddress] Detected library loading from %08X.", dwRetAddr);
+		}
+
+		if (g_dwGetProcRetAddr == dwRetAddr)
+		{
+			Log("[GetProcAddress] => %s", lpProcName);
+		}
+		else
+		{
+			Log("[GetProcAddress] End library loading. Unhooking.");
+
+			if (!SetHook(FALSE, reinterpret_cast<void**>(&GetProcAddress_Original), GetProcAddress_Hook))
+			{
+				Log("Unable to unhook GetProcAddress.");
+			}
+		}
+	}
+
+	return GetProcAddress_Original(hModule, lpProcName);
 }
 
 /// <summary>

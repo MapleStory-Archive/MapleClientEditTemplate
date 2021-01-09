@@ -56,6 +56,10 @@ public:
 		{
 			INITWINHOOK("KERNEL32", "RegCreateKeyExA", RegCreateKeyExA_Original, RegCreateKeyExA_t, RegCreateKeyExA_Hook);
 		}
+		if (MAPLETRACKING_GETPROCADDR)
+		{
+			INITWINHOOK("KERNEL32", "GetProcAddress", GetProcAddress_Original, GetProcAddress_t, GetProcAddress_Hook);
+		}
 
 		if (!bHookWinLibs) return;
 
