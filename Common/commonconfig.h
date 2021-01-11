@@ -5,6 +5,13 @@
 	try not to add version-specific settings in here
 */
 
+// use DBGLOG macro to write to log only when compiling in debug mode
+#ifdef _DEBUG
+#define DBGLOG(msg) Log("");
+#else
+#define DBGLOG(msg) ;
+#endif
+
 #define MAPLE_INJECT_USE_IJL						// comment this line out to use other injection methods (not ijl15 trojan)
 #define MAPLE_INJECT_DLLNAME	"LEN.dll"			// name of dll to inject if above line is commented out
 #define MAPLE_EXE_NAME			"MapleStory.exe"	// name of executable to start

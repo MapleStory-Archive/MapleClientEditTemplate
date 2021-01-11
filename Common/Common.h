@@ -9,11 +9,11 @@ struct Common
 public:
 	Common(BOOL bHookWinLibs, PostMutexFunc_t pMutexFunc, const char* sIP, const char* sOriginalIP)
 	{
-		Log("Common created => Hook winsock libs: %s || IP: %s || Original IP: %s", (bHookWinLibs ? "Yes" : "No"), sIP, sOriginalIP);
+		DBGLOG("Common created => Hook winsock libs: %s || IP: %s || Original IP: %s", (bHookWinLibs ? "Yes" : "No"), sIP, sOriginalIP);
 
 		if (!pMutexFunc)
 		{
-			Log("Invalid function pointer passed to Common constructor.");
+			DBGLOG("Invalid function pointer passed to Common constructor.");
 			return;
 		}
 
@@ -65,7 +65,7 @@ public:
 
 		if (!sIP || !sOriginalIP)
 		{
-			Log("Null IP string passed to Common constructor.");
+			DBGLOG("Null IP string passed to Common constructor.");
 			return;
 		}
 
@@ -78,11 +78,11 @@ public:
 
 	~Common()
 	{
-		Log("Cleaning up common..");
+		DBGLOG("Cleaning up common..");
 
 		if (g_GameSock != INVALID_SOCKET)
 		{
-			Log("Closing socket..");
+			DBGLOG("Closing socket..");
 
 			g_ProcTable.lpWSPCloseSocket(g_GameSock, NULL);
 			g_GameSock = INVALID_SOCKET;
