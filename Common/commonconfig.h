@@ -7,7 +7,7 @@
 
 // use DBGLOG macro to write to log only when compiling in debug mode
 #ifdef _DEBUG
-#define DBGLOG(msg) Log("");
+#define DBGLOG(msg) Log(msg);
 #else
 #define DBGLOG(msg) ;
 #endif
