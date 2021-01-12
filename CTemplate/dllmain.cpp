@@ -20,9 +20,11 @@
 // executed after the client is unpacked
 VOID MainFunc()
 {
-	DbgLog(__FUNCTION__);
+	Log(__FUNCTION__);
 
 	// set hooks
+
+	return;
 
 	INITMAPLEHOOK(
 		_ExampleFunc_cdecl, // pointer to original function
@@ -58,7 +60,7 @@ static Common* CommonHooks;
 // main thread
 VOID MainProc()
 {
-	DbgLog(__FUNCTION__);
+	Log(__FUNCTION__);
 
 #if MAPLE_INSTAJECT
 	MainFunc();

@@ -240,17 +240,17 @@ static HANDLE WINAPI CreateMutexA_Hook(
 {
 	if (!CreateMutexA_Original)
 	{
-		DbgLog("Original CreateMutex pointer corrupted. Failed to return mutex value to calling function.");
+		Log("Original CreateMutex pointer corrupted. Failed to return mutex value to calling function.");
 
 		return nullptr;
 	}
 	else if (lpName && strstr(lpName, MAPLE_MUTEX))
 	{
-		DbgLog("Mutex spoofed, unhooking..");
+		Log("Mutex spoofed, unhooking..");
 
 		if (!SetHook(FALSE, reinterpret_cast<void**>(&CreateMutexA_Original), CreateMutexA_Hook))
 		{
-			DbgLog("Failed to unhook mutex.");
+			Log("Failed to unhook mutex.");
 		}
 
 		OnThemidaUnpack();
@@ -341,7 +341,7 @@ static BOOL WINAPI CreateProcessA_Hook(
 
 	if (MAPLE_KILL_EXIT_WINDOW && strstr(lpCommandLine, MAPLE_KILL_EXIT_WINDOW))
 	{
-		DbgLog("[CreateProcessA] [%08X] Killing web request to: %s", _ReturnAddress(), lpApplicationName);
+		Log("[CreateProcessA] [%08X] Killing web request to: %s", _ReturnAddress(), lpApplicationName);
 		return FALSE; // ret value doesn't get used by maple after creating web requests as far as i can tell
 	}
 
@@ -404,18 +404,18 @@ static UINT WINAPI GetACP_Hook() // AOB: FF 15 ?? ?? ?? ?? 3D ?? ?? ?? 00 00 74 
 		{
 			uiNewLocale = ReadValue<DWORD>(dwRetAddr + 1); // check value is always 4 bytes
 
-			DbgLog("[GetACP] Found desired locale: %d", uiNewLocale);
+			Log("[GetACP] Found desired locale: %d", uiNewLocale);
 		}
 		else
 		{
-			DbgLog("[GetACP] Unable to automatically determine locale, using stored locale: %d", uiNewLocale);
+			Log("[GetACP] Unable to automatically determine locale, using stored locale: %d", uiNewLocale);
 		}
 
-		DbgLog("[GetACP] Locale spoofed to %d, unhooking. Calling address: %08X", uiNewLocale, dwRetAddr);
+		Log("[GetACP] Locale spoofed to %d, unhooking. Calling address: %08X", uiNewLocale, dwRetAddr);
 
 		if (!SetHook(FALSE, reinterpret_cast<void**>(&GetACP_Original), GetACP_Hook))
 		{
-			DbgLog("Failed to unhook GetACP.");
+			Log("Failed to unhook GetACP.");
 		}
 	}
 
@@ -442,7 +442,7 @@ static HWND WINAPI CreateWindowExA_Hook(
 {
 	if (MAPLE_PATCHER_CLASS && strstr(lpClassName, MAPLE_PATCHER_CLASS))
 	{
-		DbgLog("Bypassing patcher window..");
+		Log("Bypassing patcher window..");
 
 		OnThemidaUnpack();
 
@@ -522,7 +522,7 @@ static int WSPAPI WSPConnect_Hook(
 
 	if (strstr(szAddr, g_sRedirectIP))
 	{
-		DbgLog("Detected and rerouting socket connection to IP: %s", g_sOriginalIP);
+		Log("Detected and rerouting socket connection to IP: %s", g_sOriginalIP);
 		service->sin_addr.S_un.S_addr = inet_addr(g_sOriginalIP);
 		g_GameSock = s;
 	}
@@ -564,11 +564,11 @@ static int WSPAPI WSPGetPeerName_Hook(
 
 			service->sin_addr.S_un.S_addr = inet_addr(g_sOriginalIP);
 
-			DbgLog("WSPGetPeerName => IP Replaced: %s -> %s", szAddr, g_sOriginalIP);
+			Log("WSPGetPeerName => IP Replaced: %s -> %s", szAddr, g_sOriginalIP);
 		}
 		else
 		{
-			DbgLog("WSPGetPeerName => IP Ignored: %s:%d", szAddr, nPort);
+			Log("WSPGetPeerName => IP Ignored: %s:%d", szAddr, nPort);
 		}
 	}
 	else
@@ -594,7 +594,7 @@ static int WSPAPI WSPCloseSocket_Hook(
 
 	if (s == g_GameSock)
 	{
-		DbgLog("Socket closed by application.. (%d). CallAddr: %02x", nRet, _ReturnAddress());
+		Log("Socket closed by application.. (%d). CallAddr: %02x", nRet, _ReturnAddress());
 		g_GameSock = INVALID_SOCKET;
 	}
 
@@ -616,7 +616,7 @@ static int WSPAPI WSPStartup_Hook(
 
 	if (nRet == NO_ERROR)
 	{
-		DbgLog("Overriding socket routines..");
+		Log("Overriding socket routines..");
 
 		g_GameSock = INVALID_SOCKET;
 		g_ProcTable = *lpProcTable;

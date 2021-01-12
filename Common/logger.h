@@ -18,7 +18,7 @@ static void Log(const char* format, ...)
 	va_start(args, format);
 	vsprintf_s(buf, format, args);
 
-	OutputDebugStringA(buf);
+	OutputDebugString(buf);
 
 	va_end(args);
 }
@@ -26,12 +26,12 @@ static void Log(const char* format, ...)
 /// <summary>
 /// Prints to windows debug output if program was compiled with debug flag.
 /// </summary>
-static void DbgLog(const char* format, ...)
-{
-#ifdef _DEBUG
-	Log(format);
-#endif
-}
+//static void DbgLog(const char* format, ...)
+//{
+//#ifdef _DEBUG
+//	Log(format);
+//#endif
+//}
 
 /// <summary>
 /// Print call stack information to debug output
