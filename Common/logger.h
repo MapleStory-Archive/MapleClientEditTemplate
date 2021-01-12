@@ -24,6 +24,16 @@ static void Log(const char* format, ...)
 }
 
 /// <summary>
+/// Prints to windows debug output if program was compiled with debug flag.
+/// </summary>
+static void DbgLog(const char* format, ...)
+{
+#ifdef _DEBUG
+	Log(format);
+#endif
+}
+
+/// <summary>
 /// Print call stack information to debug output
 /// </summary>
 static void PrintStackTrace(unsigned long dwSize = 10)

@@ -10,14 +10,14 @@
 #define INITWINHOOK(sModName, sFuncName, pOrigFunc, Func_t, pNewFunc)		\
 pOrigFunc = (Func_t)GetFuncAddress(sModName, sFuncName);					\
 if (SetHook(TRUE, reinterpret_cast<void**>(&pOrigFunc), pNewFunc))			\
-{ DBGLOG("Hooked %s", sFuncName); }											\
+{ DbgLog("Hooked %s", sFuncName); }											\
 else																		\
-{ DBGLOG("Failed to hook %s", sFuncName); } // end macro
+{ DbgLog("Failed to hook %s", sFuncName); } // end macro
 
 #define INITMAPLEHOOK(pOrigFunc, Func_t, pNewFunc, dwAddress)				\
 pOrigFunc = reinterpret_cast<Func_t>(dwAddress);							\
 if (!SetHook(TRUE, reinterpret_cast<void**>(&pOrigFunc), pNewFunc))			\
-{ DBGLOG("Failed to hook maple func at address %d", dwAddress); } // end macro
+{ DbgLog("Failed to hook maple func at address %d", dwAddress); } // end macro
 
 #define HOOKDEF(retType, callConv, defName, typeName, funcName, ...)		\
 typedef retType (callConv* typeName)(__VA_ARGS__);							\

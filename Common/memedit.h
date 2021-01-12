@@ -35,7 +35,7 @@ static VOID PatchCall(DWORD dwAddress, PVOID pDestination)
 
 static VOID PatchNop(DWORD dwAddress, UINT nCount)
 {
-	for (int i = 0; i < nCount; i++)
+	for (UINT i = 0; i < nCount; i++)
 		*(BYTE*)(dwAddress + i) = x86NOP;
 }
 

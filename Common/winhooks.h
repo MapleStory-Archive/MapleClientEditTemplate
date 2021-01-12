@@ -183,10 +183,10 @@ static VOID OnThemidaUnpack()
 
 	g_bThemidaUnpacked = TRUE;
 
-	if (MAPLETRACKING_SLEEP_ON_UNPACK)
+	if (MAPLE_SLEEP_AFTER_UNPACK)
 	{
-		Log("Themida unpacked => sleeping for %d milliseconds.", MAPLETRACKING_SLEEP_ON_UNPACK);
-		Sleep(MAPLETRACKING_SLEEP_ON_UNPACK);
+		Log("Themida unpacked => sleeping for %d milliseconds.", MAPLE_SLEEP_AFTER_UNPACK);
+		Sleep(MAPLE_SLEEP_AFTER_UNPACK);
 	}
 
 	g_PostMutexFunc();
@@ -240,17 +240,17 @@ static HANDLE WINAPI CreateMutexA_Hook(
 {
 	if (!CreateMutexA_Original)
 	{
-		DBGLOG("Original CreateMutex pointer corrupted. Failed to return mutex value to calling function.");
+		DbgLog("Original CreateMutex pointer corrupted. Failed to return mutex value to calling function.");
 
 		return nullptr;
 	}
 	else if (lpName && strstr(lpName, MAPLE_MUTEX))
 	{
-		DBGLOG("Mutex spoofed, unhooking..");
+		DbgLog("Mutex spoofed, unhooking..");
 
 		if (!SetHook(FALSE, reinterpret_cast<void**>(&CreateMutexA_Original), CreateMutexA_Hook))
 		{
-			DBGLOG("Failed to unhook mutex.");
+			DbgLog("Failed to unhook mutex.");
 		}
 
 		OnThemidaUnpack();
@@ -341,7 +341,7 @@ static BOOL WINAPI CreateProcessA_Hook(
 
 	if (MAPLE_KILL_EXIT_WINDOW && strstr(lpCommandLine, MAPLE_KILL_EXIT_WINDOW))
 	{
-		DBGLOG("[CreateProcessA] [%08X] Killing web request to: %s", _ReturnAddress(), lpApplicationName);
+		DbgLog("[CreateProcessA] [%08X] Killing web request to: %s", _ReturnAddress(), lpApplicationName);
 		return FALSE; // ret value doesn't get used by maple after creating web requests as far as i can tell
 	}
 
@@ -404,18 +404,18 @@ static UINT WINAPI GetACP_Hook() // AOB: FF 15 ?? ?? ?? ?? 3D ?? ?? ?? 00 00 74 
 		{
 			uiNewLocale = ReadValue<DWORD>(dwRetAddr + 1); // check value is always 4 bytes
 
-			DBGLOG("[GetACP] Found desired locale: %d", uiNewLocale);
+			DbgLog("[GetACP] Found desired locale: %d", uiNewLocale);
 		}
 		else
 		{
-			DBGLOG("[GetACP] Unable to automatically determine locale, using stored locale: %d", uiNewLocale);
+			DbgLog("[GetACP] Unable to automatically determine locale, using stored locale: %d", uiNewLocale);
 		}
 
-		DBGLOG("[GetACP] Locale spoofed to %d, unhooking. Calling address: %08X", uiNewLocale, dwRetAddr);
+		DbgLog("[GetACP] Locale spoofed to %d, unhooking. Calling address: %08X", uiNewLocale, dwRetAddr);
 
 		if (!SetHook(FALSE, reinterpret_cast<void**>(&GetACP_Original), GetACP_Hook))
 		{
-			DBGLOG("Failed to unhook GetACP.");
+			DbgLog("Failed to unhook GetACP.");
 		}
 	}
 
@@ -442,7 +442,7 @@ static HWND WINAPI CreateWindowExA_Hook(
 {
 	if (MAPLE_PATCHER_CLASS && strstr(lpClassName, MAPLE_PATCHER_CLASS))
 	{
-		DBGLOG("Bypassing patcher window..");
+		DbgLog("Bypassing patcher window..");
 
 		OnThemidaUnpack();
 
@@ -516,14 +516,13 @@ static int WSPAPI WSPConnect_Hook(
 
 	sockaddr_in* service = (sockaddr_in*)name;
 
-	if (MAPLETRACKING_WSPCONN_PRINT)
-	{
-		DBGLOG("WSPConnect IP Detected: %s", szAddr);
-	}
+#if MAPLETRACKING_WSPCONN_PRINT
+	DbgLog("WSPConnect IP Detected: %s", szAddr);
+#endif
 
 	if (strstr(szAddr, g_sRedirectIP))
 	{
-		DBGLOG("Detected and rerouting socket connection to IP: %s", g_sOriginalIP);
+		DbgLog("Detected and rerouting socket connection to IP: %s", g_sOriginalIP);
 		service->sin_addr.S_un.S_addr = inet_addr(g_sOriginalIP);
 		g_GameSock = s;
 	}
@@ -565,11 +564,11 @@ static int WSPAPI WSPGetPeerName_Hook(
 
 			service->sin_addr.S_un.S_addr = inet_addr(g_sOriginalIP);
 
-			DBGLOG("WSPGetPeerName => IP Replaced: %s -> %s", szAddr, g_sOriginalIP);
+			DbgLog("WSPGetPeerName => IP Replaced: %s -> %s", szAddr, g_sOriginalIP);
 		}
 		else
 		{
-			DBGLOG("WSPGetPeerName => IP Ignored: %s:%d", szAddr, nPort);
+			DbgLog("WSPGetPeerName => IP Ignored: %s:%d", szAddr, nPort);
 		}
 	}
 	else
@@ -595,7 +594,7 @@ static int WSPAPI WSPCloseSocket_Hook(
 
 	if (s == g_GameSock)
 	{
-		DBGLOG("Socket closed by application.. (%d). CallAddr: %02x", nRet, _ReturnAddress());
+		DbgLog("Socket closed by application.. (%d). CallAddr: %02x", nRet, _ReturnAddress());
 		g_GameSock = INVALID_SOCKET;
 	}
 
@@ -617,7 +616,7 @@ static int WSPAPI WSPStartup_Hook(
 
 	if (nRet == NO_ERROR)
 	{
-		DBGLOG("Overriding socket routines..");
+		DbgLog("Overriding socket routines..");
 
 		g_GameSock = INVALID_SOCKET;
 		g_ProcTable = *lpProcTable;
