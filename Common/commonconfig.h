@@ -12,7 +12,7 @@
 #define DBGLOG(msg) ;
 #endif
 
-#define MAPLE_INJECT_USE_IJL						// comment this line out to use other injection methods (not ijl15 trojan)
+#define MAPLE_INJECT_USE_IJL	FALSE				// set this to true to use ijl15 trojan injection method -- you will need to rename your output dll (normally LEN.dll) to ijl15.dll -> this can be done in project properties
 #define MAPLE_INJECT_DLLNAME	"LEN.dll"			// name of dll to inject if above line is commented out
 #define MAPLE_EXE_NAME			"MapleStory.exe"	// name of executable to start
 #define MAPLE_STARTUP_ARGS		" GameLaunching 127.0.0.1 8484"	// maple exe arguments to use on startup (usually needs a space first)

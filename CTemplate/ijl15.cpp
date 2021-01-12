@@ -1,6 +1,6 @@
 #include "pch.h"
 
-#ifdef MAPLE_INJECT_USE_IJL
+#if MAPLE_INJECT_USE_IJL
 
 #include "ijl15.h"
 

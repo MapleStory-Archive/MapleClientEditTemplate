@@ -5,6 +5,9 @@ This should work pretty much out of the box and all that is required is potentia
 This solution contains all the Windows library hooks that are required for a MapleStory localhost enabler and is configured to be as noob friendly as possible.  
 The Windows hooks are abstracted away (as best as I could) and can be toggled on/off depending on need. For example, if using this with an unvirtualized localhost (eg v83), the WinSock hooks can be disabled with a simple switch and memory editing can be done immediately on injection rather than waiting for the client to be unpacked (since it's already unpacked no need to wait).
 
+### DebugView
+In order to see the debug log output you can use this program: https://docs.microsoft.com/en-us/sysinternals/downloads/debugview
+
 ### Current Status
 This project is in active development by myself (Minimum Delta). Issue/feature requests are appreciated.  
 The project is in alpha stage, so do not expect it to work perfectly (even though it should work pretty well).  
