@@ -331,13 +331,12 @@ static BOOL WINAPI CreateProcessA_Hook(
 	LPSTARTUPINFOA        lpStartupInfo,
 	LPPROCESS_INFORMATION lpProcessInformation)
 {
-	if (MAPLETRACKING_CREATE_PROCESS)
-	{
-		auto sAppName = lpApplicationName ? lpApplicationName : "Null App Name";
-		auto sArgs = lpCommandLine ? lpCommandLine : "Null Args";
+#if MAPLETRACKING_CREATE_PROCESS
+	auto sAppName = lpApplicationName ? lpApplicationName : "Null App Name";
+	auto sArgs = lpCommandLine ? lpCommandLine : "Null Args";
 
-		Log("CreateProcessA -> %s : %s", sAppName, sArgs);
-	}
+	Log("CreateProcessA -> %s : %s", sAppName, sArgs);
+#endif
 
 	if (MAPLE_KILL_EXIT_WINDOW && strstr(lpCommandLine, MAPLE_KILL_EXIT_WINDOW))
 	{
@@ -512,7 +511,7 @@ static int WSPAPI WSPConnect_Hook(
 {
 	char szAddr[50];
 	DWORD dwLen = 50;
-	WSAAddressToStringA((sockaddr*)name, namelen, NULL, szAddr, &dwLen);
+	WSAAddressToString((sockaddr*)name, namelen, NULL, szAddr, &dwLen);
 
 	sockaddr_in* service = (sockaddr_in*)name;
 
@@ -546,7 +545,7 @@ static int WSPAPI WSPGetPeerName_Hook(
 	{
 		char szAddr[50];
 		DWORD dwLen = 50;
-		WSAAddressToStringA((sockaddr*)name, *namelen, NULL, szAddr, &dwLen);
+		WSAAddressToString((sockaddr*)name, *namelen, NULL, szAddr, &dwLen);
 
 		sockaddr_in* service = (sockaddr_in*)name;
 
@@ -556,7 +555,7 @@ static int WSPAPI WSPGetPeerName_Hook(
 		{
 			char szAddr[50];
 			DWORD dwLen = 50;
-			WSAAddressToStringA((sockaddr*)name, *namelen, NULL, szAddr, &dwLen);
+			WSAAddressToString((sockaddr*)name, *namelen, NULL, szAddr, &dwLen);
 
 			sockaddr_in* service = (sockaddr_in*)name;
 

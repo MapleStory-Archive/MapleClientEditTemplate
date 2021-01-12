@@ -23,6 +23,16 @@ public:
 		// required for proper injection
 		INITWINHOOK("KERNEL32", "CreateMutexA", CreateMutexA_Original, CreateMutexA_t, CreateMutexA_Hook);
 
+		if (MAPLE_PATCHER_CLASS)
+		{
+			INITWINHOOK("USER32", "CreateWindowExA", CreateWindowExA_Original, CreateWindowExA_t, CreateWindowExA_Hook);
+		}
+
+		if (MAPLE_LOCALE_SPOOF)
+		{
+			INITWINHOOK("KERNEL32", "GetACP", GetACP_Original, GetACP_t, GetACP_Hook);
+		}
+
 #if MAPLETRACKING_OPEN_PROC
 		INITWINHOOK("KERNEL32", "OpenProcess", OpenProcess_Original, OpenProcess_t, OpenProcess_Hook);
 #endif
@@ -32,9 +42,10 @@ public:
 		INITWINHOOK("KERNEL32", "CreateProcessA", CreateProcessA_Original, CreateProcessA_t, CreateProcessA_Hook);
 
 #else
-#if MAPLE_KILL_EXIT_WINDOW
-		INITWINHOOK("KERNEL32", "CreateProcessA", CreateProcessA_Original, CreateProcessA_t, CreateProcessA_Hook);
-#endif
+		if (MAPLE_KILL_EXIT_WINDOW)
+		{
+			INITWINHOOK("KERNEL32", "CreateProcessA", CreateProcessA_Original, CreateProcessA_t, CreateProcessA_Hook);
+		}
 #endif
 
 #if MAPLETRACKING_OPEN_MUTEXA
@@ -43,14 +54,6 @@ public:
 
 #if MAPLETRACKING_NT_TERMINATE_PROC
 		INITWINHOOK("NTDLL", "NtTerminateProcess", NtTerminateProcess_Original, NtTerminateProcess_t, NtTerminateProcess_Hook);
-#endif
-
-#if MAPLE_LOCALE_SPOOF
-		INITWINHOOK("KERNEL32", "GetACP", GetACP_Original, GetACP_t, GetACP_Hook);
-#endif
-
-#if MAPLE_PATCHER_CLASS
-		INITWINHOOK("USER32", "CreateWindowExA", CreateWindowExA_Original, CreateWindowExA_t, CreateWindowExA_Hook);
 #endif
 
 #if MAPLETRACKING_REGCREATEKEY

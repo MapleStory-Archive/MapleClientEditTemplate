@@ -26,6 +26,8 @@ VOID MainFunc()
 
 	return;
 
+	// below hooks only serve as examples -- they will not do anything as-is
+
 	INITMAPLEHOOK(
 		_ExampleFunc_cdecl, // pointer to original function
 		_ExampleFunc_cdecl_t, // function type
