@@ -3,8 +3,6 @@
 #include <io.h>
 #include "commonconfig.h"
 
-__declspec(dllimport) void ord1(int hash);
-
 void ErrorBox(const char* format, ...)
 {
 	char szMessage[1024];
@@ -50,8 +48,18 @@ int main()
 
 	if (bCreateProc)
 	{
-		const char* szDllName = MAPLE_INJECT_DLLNAME;
-		const size_t nLoadDllStrLen = strlen(szDllName);
+#if !MAPLE_INJECT_USE_IJL
+		size_t nLoadDllStrLen;
+
+		if (MAPLE_INJECT_DLLNAME)
+		{
+			nLoadDllStrLen = strlen(MAPLE_INJECT_DLLNAME);
+		}
+		else
+		{
+			ErrorBoxWithCode("DLL name is null.");
+			return FALSE;
+		}
 
 		HMODULE hKernel = GetModuleHandleA("Kernel32.dll");
 
@@ -74,7 +82,7 @@ int main()
 			ErrorBoxWithCode("Unable to allocate memory.");
 		}
 
-		BOOL bWriteProc = WriteProcessMemory(piMaple.hProcess, lpRemoteStr, szDllName, nLoadDllStrLen, NULL);
+		BOOL bWriteProc = WriteProcessMemory(piMaple.hProcess, lpRemoteStr, MAPLE_INJECT_DLLNAME, nLoadDllStrLen, NULL);
 
 		if (!bWriteProc)
 		{
@@ -87,19 +95,21 @@ int main()
 		{
 			ErrorBoxWithCode("Unable to create remote thread.");
 		}
+#endif
 
-		if (MAPLE_UNSUSPEND)
+#if MAPLE_UNSUSPEND
+		DWORD dwRet = ResumeThread(piMaple.hThread);
+
+		if (dwRet == -1)
 		{
-			DWORD dwRet = ResumeThread(piMaple.hThread);
-
-			if (dwRet == -1)
-			{
-				ErrorBoxWithCode("Unable to resume thread.");
-			}
+			ErrorBoxWithCode("Unable to resume thread.");
 		}
+#endif
 
+#if !MAPLE_INJECT_USE_IJL
 		// close handle for injected dll
 		CloseHandle(hRemThread);
+#endif
 
 		// Close process and thread handles. 
 		CloseHandle(piMaple.hProcess);
