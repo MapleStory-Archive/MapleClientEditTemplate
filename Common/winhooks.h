@@ -516,7 +516,7 @@ static int WSPAPI WSPConnect_Hook(
 	sockaddr_in* service = (sockaddr_in*)name;
 
 #if MAPLETRACKING_WSPCONN_PRINT
-	DbgLog("WSPConnect IP Detected: %s", szAddr);
+	Log("WSPConnect IP Detected: %s", szAddr);
 #endif
 
 	if (strstr(szAddr, g_sRedirectIP))
@@ -581,9 +581,6 @@ static int WSPAPI WSPGetPeerName_Hook(
 /// <summary>
 /// 
 /// </summary>
-/// <param name="s"></param>
-/// <param name="lpErrno"></param>
-/// <returns></returns>
 static int WSPAPI WSPCloseSocket_Hook(
 	SOCKET s,
 	LPINT  lpErrno

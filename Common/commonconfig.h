@@ -26,7 +26,7 @@ constexpr auto MAPLE_SLEEP_AFTER_UNPACK = 0;	// number of seconds to sleep when 
 #define MAPLE_INSTAJECT			FALSE	// if true dll will immediately edit memory after injecting (when target exe is unvirtualized)
 
 // below are used for debug logging
-#define MAPLETRACKING_WSPCONN_PRINT		FALSE		// print all wspconnect requests -- useful for finding maple IPs
+#define MAPLETRACKING_WSPCONN_PRINT		TRUE		// print all wspconnect requests -- useful for finding maple IPs
 #define MAPLETRACKING_NT_TERMINATE_PROC TRUE		// hook and log NtTerminateProc
 #define MAPLETRACKING_OPEN_PROC			TRUE		// hook and log OpenProcess
 #define MAPLETRACKING_CREATE_PROCESS	TRUE		// hook and log CreateProcess(A&W)
