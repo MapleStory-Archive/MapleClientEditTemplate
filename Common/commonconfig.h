@@ -24,6 +24,7 @@ constexpr auto MAPLE_SLEEP_AFTER_UNPACK = 0;	// number of seconds to sleep when 
 #define MAPLE_INJECT_USE_IJL	FALSE	// set this to true to use ijl15 trojan injection method -- you will need to rename your output dll (normally LEN.dll) to ijl15.dll -> this can be done in project properties
 #define MAPLE_UNSUSPEND			TRUE	// false to stay suspended after exe is started and dll is injected (normally should be true)
 #define MAPLE_INSTAJECT			FALSE	// if true dll will immediately edit memory after injecting (when target exe is unvirtualized)
+#define MAPLE_MULTICLIENT		TRUE
 
 // below are used for debug logging
 #define MAPLETRACKING_WSPCONN_PRINT		TRUE		// print all wspconnect requests -- useful for finding maple IPs

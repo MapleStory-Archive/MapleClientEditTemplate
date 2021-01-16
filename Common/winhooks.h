@@ -246,13 +246,16 @@ static HANDLE WINAPI CreateMutexA_Hook(
 	}
 	else if (lpName && strstr(lpName, MAPLE_MUTEX))
 	{
-		Log("Mutex spoofed, unhooking..");
+#if MAPLE_MULTICLIENT
+		// from https://github.com/pokiuwu/AuthHook-v203.4/blob/AuthHook-v203.4/Client176/WinHook.cpp
 
-		if (!SetHook(FALSE, reinterpret_cast<void**>(&CreateMutexA_Original), CreateMutexA_Hook))
-		{
-			Log("Failed to unhook mutex.");
-		}
+		char szMutex[128];
+		int nPID = GetCurrentProcessId();
 
+		sprintf_s(szMutex, "%s-%d", lpName, nPID);
+		lpName = szMutex;
+#endif
+		
 		OnThemidaUnpack();
 
 		return CreateMutexA_Original(lpMutexAttributes, bInitialOwner, lpName);
