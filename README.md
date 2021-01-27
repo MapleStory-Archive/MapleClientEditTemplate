@@ -8,6 +8,10 @@ The Windows hooks are abstracted away (as best as I could) and can be toggled on
 ### DebugView
 In order to see the debug log output you can use this program: https://docs.microsoft.com/en-us/sysinternals/downloads/debugview
 
+### Tutorial
+I recorded a tutorial on how to use this package which can be watched here: https://www.youtube.com/watch?v=Yr5IOhc5sPk  
+ALSO: Join the discord for support! https://discord.gg/tmyac7tU
+
 ### Current Status
 This project is in active development by myself (Minimum Delta). Issue/feature requests are appreciated.  
 The project is in alpha stage, so do not expect it to work perfectly (even though it should work pretty well).  
@@ -17,13 +21,15 @@ Darter (aka Moozi) 	- Very helpful mentor
 Ez					- Another mentor and friend  
 SunCat				- Great insight from this friendly fellow  
 The Muffin Man		- Always staying positive  
-DAVHEED				- BUTT JUICE GANG GANG GANG  
+DAVHEED				- u know 
 
 ### Setup
-I'm going to expand this at some point, but there's a few things that need to be configured in order for the project to work:  
-* Put detours.lib into your Debug folder (folder generated on compilation in main folder)
-* Paste: $(SolutionDir)Common;%(AdditionalIncludeDirectories) in your (CTemplate) project properties -> c/c++ -> additional include directories. This will let the project see the other files for proper compilation. It will not compile unless this is done properly.
-* Sometimes VS defaults to x64 which is incorrect and will not work. Make sure you're compiling in Debug x86 -> if you try to compile in x64 it'll give detour linker errors.
+BE ADVISED:  
+The below is no longer required, but I'm keeping it here in-case something breaks in the future. The solution should work out-of-the-box with no configuration required.  
+_I'm going to expand this at some point, but there's a few things that need to be configured in order for the project to work:_  
+* _Put detours.lib into your Debug folder (folder generated on compilation in main folder)_
+* _Paste: $(SolutionDir)Common;%(AdditionalIncludeDirectories) in your (CTemplate) project properties -> c/c++ -> additional include directories. This will let the project see the other files for proper compilation. It will not compile unless this is done properly._
+* _Sometimes VS defaults to x64 which is incorrect and will not work. Make sure you're compiling in Debug x86 -> if you try to compile in x64 it'll give detour linker errors._
 
 ### Config settings
 All generic config settings are in commonconfig.h. More information on the specifics of this will come at a later point (documentation is always last, eh). However, I've commented reasonbly well so it should be pretty apparent what each setting does.
@@ -45,8 +51,7 @@ Unlike MapleStory function hooks, outside API hooks (winhooks) do not need to wa
 It is recommended to keep all hooking and memory editing inside (or called from) that function.
 
 ### MapleAPI Hooking Examples
-MapleStory function hook examples will be added in the future -- currently there is support to add them but there are none added yet.  
-These will be more or less version specific which is why I excluded it from the initial template upload.
+I have added some simple memory editing and hooking examples to the repo. They are also explained in the above linked YouTube series.
 
 
 
