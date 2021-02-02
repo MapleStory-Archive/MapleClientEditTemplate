@@ -203,26 +203,14 @@ static FARPROC WINAPI GetProcAddress_Hook(HMODULE hModule, LPCSTR lpProcName)
 	{
 		DWORD dwRetAddr = reinterpret_cast<DWORD>(_ReturnAddress());
 
-		if (!g_dwGetProcRetAddr)
+		if (g_dwGetProcRetAddr != dwRetAddr)
 		{
 			g_dwGetProcRetAddr = dwRetAddr;
 
 			Log("[GetProcAddress] Detected library loading from %08X.", dwRetAddr);
 		}
 
-		if (g_dwGetProcRetAddr == dwRetAddr)
-		{
-			Log("[GetProcAddress] => %s", lpProcName);
-		}
-		else
-		{
-			Log("[GetProcAddress] End library loading. Unhooking.");
-
-			if (!SetHook(FALSE, reinterpret_cast<void**>(&GetProcAddress_Original), GetProcAddress_Hook))
-			{
-				Log("Unable to unhook GetProcAddress.");
-			}
-		}
+		Log("[GetProcAddress] => %s", lpProcName);
 	}
 
 	return GetProcAddress_Original(hModule, lpProcName);
