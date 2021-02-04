@@ -7,18 +7,23 @@
 struct Common
 {
 public:
-	Common(BOOL bHookWinLibs, PostMutexFunc_t pMutexFunc, const char* sIP, const char* sOriginalIP)
+	Common(BOOL bHookWinLibs, PostMutexFunc_t pPostMutexFunc, const char* sIP, const char* sOriginalIP)
 	{
 		Log("Common created => Hook winsock libs: %s || IP: %s || Original IP: %s", (bHookWinLibs ? "Yes" : "No"), sIP, sOriginalIP);
 
-		if (!pMutexFunc)
+		if (!pPostMutexFunc)
 		{
 			Log("Invalid function pointer passed to Common constructor.");
 			return;
 		}
 
+#if MAPLE_INSTAJECT
+		pMutexFunc(); // call post-unpack function right away
+#else
 		// set pointer to function that is executed after client unpacks itself
-		g_PostMutexFunc = pMutexFunc;
+		g_PostMutexFunc = pPostMutexFunc;
+#endif
+
 
 		// required for proper injection
 		INITWINHOOK("KERNEL32", "CreateMutexA", CreateMutexA_Original, CreateMutexA_t, CreateMutexA_Hook);

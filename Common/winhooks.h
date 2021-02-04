@@ -179,6 +179,10 @@ const char* g_sOriginalIP;
 /// </summary>
 static VOID OnThemidaUnpack()
 {
+#if MAPLE_INSTAJECT
+	return; // shouldn't even be called in the first place but i'm adding another check just in case
+#endif
+
 	if (g_bThemidaUnpacked) return;
 
 	g_bThemidaUnpacked = TRUE;
@@ -243,8 +247,10 @@ static HANDLE WINAPI CreateMutexA_Hook(
 		sprintf_s(szMutex, "%s-%d", lpName, nPID);
 		lpName = szMutex;
 #endif
-		
+
+#if !MAPLE_INSTAJECT
 		OnThemidaUnpack();
+#endif
 
 		return CreateMutexA_Original(lpMutexAttributes, bInitialOwner, lpName);
 	}
@@ -434,7 +440,9 @@ static HWND WINAPI CreateWindowExA_Hook(
 	{
 		Log("Bypassing patcher window..");
 
+#if !MAPLE_INSTAJECT
 		OnThemidaUnpack();
+#endif
 
 		return NULL;
 	}
@@ -446,7 +454,9 @@ static HWND WINAPI CreateWindowExA_Hook(
 			dwStyle = 0xCA0000;
 		}
 
+#if !MAPLE_INSTAJECT
 		OnThemidaUnpack();
+#endif
 
 		return CreateWindowExA_Original(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
 	}

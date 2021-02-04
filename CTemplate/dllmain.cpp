@@ -64,16 +64,12 @@ VOID MainProc()
 {
 	Log(__FUNCTION__);
 
-#if MAPLE_INSTAJECT
-	MainFunc();
-#else
 	CommonHooks = new Common(
 		TRUE,			// true if you want to hook windows libraries (besides mutex)
 						//		set this to false if you already edited your IP into the client (eg v83 localhosts)
 		&MainFunc,		// function to be executed after client is unpacked
 		"127.0.0.1",	// IP to connec to (your server IP)
 		"127.0.0.1");	// IP to redirect from (nexon IP)
-#endif
 }
 
 // dll entry point
