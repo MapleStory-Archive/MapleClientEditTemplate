@@ -193,6 +193,7 @@ static VOID OnThemidaUnpack()
 		Sleep(MAPLE_SLEEP_AFTER_UNPACK);
 	}
 
+	Log("Themida unpacked, editing memory..");
 	g_PostMutexFunc();
 }
 
@@ -270,7 +271,7 @@ static HANDLE WINAPI OpenMutexA_Hook(
 {
 	Log("Opening mutex %s", lpName);
 
-	if (strstr(lpName, "Global")) // make sure we only override hackshield
+	if (strstr(lpName, "meteora")) // make sure we only override hackshield
 	{
 		// return handle to a spoofed mutex so it can close the handle
 		return CreateMutexA_Original(NULL, TRUE, "FakeMutex1");
@@ -436,6 +437,8 @@ static HWND WINAPI CreateWindowExA_Hook(
 	LPVOID    lpParam
 )
 {
+	Log("[CreateWindowExA] => %s - %s", lpClassName, lpWindowName);
+
 	if (MAPLE_PATCHER_CLASS && strstr(lpClassName, MAPLE_PATCHER_CLASS))
 	{
 		Log("Bypassing patcher window..");
@@ -520,10 +523,10 @@ static int WSPAPI WSPConnect_Hook(
 	Log("WSPConnect IP Detected: %s", szAddr);
 #endif
 
-	if (strstr(szAddr, g_sRedirectIP))
+	if (strstr(szAddr, g_sOriginalIP))
 	{
-		Log("Detected and rerouting socket connection to IP: %s", g_sOriginalIP);
-		service->sin_addr.S_un.S_addr = inet_addr(g_sOriginalIP);
+		Log("Detected and rerouting socket connection to IP: %s", g_sRedirectIP);
+		service->sin_addr.S_un.S_addr = inet_addr(g_sRedirectIP);
 		g_GameSock = s;
 	}
 
@@ -562,7 +565,7 @@ static int WSPAPI WSPGetPeerName_Hook(
 
 			u_short nPort = ntohs(service->sin_port);
 
-			service->sin_addr.S_un.S_addr = inet_addr(g_sOriginalIP);
+			service->sin_addr.S_un.S_addr = inet_addr(g_sRedirectIP);
 
 			Log("WSPGetPeerName => IP Replaced: %s -> %s", szAddr, g_sOriginalIP);
 		}

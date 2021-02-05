@@ -47,7 +47,7 @@ public:
 		INITWINHOOK("KERNEL32", "CreateProcessA", CreateProcessA_Original, CreateProcessA_t, CreateProcessA_Hook);
 
 #else
-		if (MAPLE_KILL_EXIT_WINDOW)
+		if (strlen(MAPLE_KILL_EXIT_WINDOW))
 		{
 			INITWINHOOK("KERNEL32", "CreateProcessA", CreateProcessA_Original, CreateProcessA_t, CreateProcessA_Hook);
 		}
