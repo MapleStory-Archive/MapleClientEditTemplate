@@ -156,6 +156,7 @@
     <ClInclude Include="Common.h" />
     <ClInclude Include="commonconfig.h" />
     <ClInclude Include="detours.h" />
+    <ClInclude Include="FakeModule.h" />
     <ClInclude Include="hooker.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="memedit.h" />
@@ -170,6 +171,9 @@
   </ItemGroup>
   <ItemGroup>
     <Library Include="detours.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="FakeModule.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -21,16 +21,16 @@ constexpr auto MAPLE_MUTEX = "WvsClientMtx";			// name of client mutex -- this i
 constexpr auto MAPLE_LOCALE_SPOOF = 0;					// region/locale ID to spoof -- set to 0 to skip spoofing locale
 constexpr auto MAPLE_SLEEP_AFTER_UNPACK = 0;	// number of seconds to sleep when first library call after themida unpacking is triggered (0 for nothing)
 
-#define MAPLE_INJECT_USE_IJL	FALSE	// set this to true to use ijl15 trojan injection method -- you will need to rename your output dll (normally LEN.dll) to ijl15.dll -> this can be done in project properties
+#define MAPLE_INJECT_USE_IJL	TRUE	// set this to true to use ijl15 trojan injection method -- you will need to rename your output dll (normally LEN.dll) to ijl15.dll -> this can be done in project properties
 #define MAPLE_UNSUSPEND			TRUE	// false to stay suspended after exe is started and dll is injected (normally should be true)
 #define MAPLE_INSTAJECT			FALSE	// if true dll will immediately edit memory after injecting (when target exe is unvirtualized)
 #define MAPLE_MULTICLIENT		TRUE
 
 // below are used for debug logging
-#define MAPLETRACKING_WSPCONN_PRINT		TRUE		// print all wspconnect requests -- useful for finding maple IPs
+#define MAPLETRACKING_WSPCONN_PRINT		FALSE		// print all wspconnect requests -- useful for finding maple IPs
 #define MAPLETRACKING_NT_TERMINATE_PROC TRUE		// hook and log NtTerminateProc
-#define MAPLETRACKING_OPEN_PROC			TRUE		// hook and log OpenProcess
+#define MAPLETRACKING_OPEN_PROC			FALSE		// hook and log OpenProcess
 #define MAPLETRACKING_CREATE_PROCESS	TRUE		// hook and log CreateProcess(A&W)
 #define MAPLETRACKING_OPEN_MUTEXA		TRUE		// hook, log, and spoof OpenMutexA
-#define MAPLETRACKING_REGCREATEKEY		TRUE		// hook and log regcreatekey values
+#define MAPLETRACKING_REGCREATEKEY		FALSE		// hook and log regcreatekey values
 #define MAPLETRACKING_GETPROCADDR		FALSE		// hook and log getprocaddr strings. logs all calls from the calling address after mutex is triggered, then it unhooks itself

@@ -7,6 +7,7 @@
 #include "hooker.h"
 #include "logger.h"
 #include "memedit.h"
+#include "FakeModule.h"
 
 // fix returnaddress func
 // https://docs.microsoft.com/en-us/cpp/intrinsics/returnaddress?view=msvc-160
@@ -160,7 +161,9 @@ RegCreateKeyExA_t RegCreateKeyExA_Original;
 
 #pragma endregion
 
-bool g_bThemidaUnpacked = false;
+FakeModule* g_FakeHsModule;
+
+BOOL g_bThemidaUnpacked = false;
 
 DWORD g_dwGetProcRetAddr = 0;
 
@@ -273,6 +276,19 @@ static HANDLE WINAPI OpenMutexA_Hook(
 
 	if (strstr(lpName, "meteora")) // make sure we only override hackshield
 	{
+		Log("Detected HS mutex => spoofing.");
+
+		g_FakeHsModule = new FakeModule();
+
+		if (!g_FakeHsModule->CreateModule("ehsvc.dll"))
+		{
+			Log("Unable to create fake HS module.");
+		}
+		else
+		{
+			Log("Fake HS module loaded.");
+		}
+
 		// return handle to a spoofed mutex so it can close the handle
 		return CreateMutexA_Original(NULL, TRUE, "FakeMutex1");
 	}

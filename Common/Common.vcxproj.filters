@@ -19,6 +19,9 @@
     <Filter Include="Header Files\Tools">
       <UniqueIdentifier>{99fc11fd-c7ce-4ed7-9985-42a80e654ac2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FakeModule">
+      <UniqueIdentifier>{1987d19a-3c1d-45ff-bb93-51bc09536df4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="detours.h">
@@ -63,10 +66,18 @@
     <ClInclude Include="memedit.h">
       <Filter>Header Files\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="FakeModule.h">
+      <Filter>FakeModule</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="detours.lib">
       <Filter>Resource Files</Filter>
     </Library>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="FakeModule.cpp">
+      <Filter>FakeModule</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -88,6 +88,13 @@ public:
 	{
 		Log("Cleaning up common..");
 
+		if (g_FakeHsModule)
+		{
+			// TODO figure out some common library call to put this instead of in dll detach
+			// CLogo constructor is pretty good but its not a library call so idk
+			g_FakeHsModule->DeleteModule();
+		}
+
 		if (g_GameSock != INVALID_SOCKET)
 		{
 			Log("Closing socket..");
