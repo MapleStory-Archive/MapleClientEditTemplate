@@ -18,7 +18,7 @@ public:
 		}
 
 #if MAPLE_INSTAJECT
-		pMutexFunc(); // call post-unpack function right away
+		pPostMutexFunc(); // call post-unpack function right away
 #else
 		// set pointer to function that is executed after client unpacks itself
 		g_PostMutexFunc = pPostMutexFunc;
