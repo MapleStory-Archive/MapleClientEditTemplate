@@ -1,7 +1,6 @@
 #pragma once
 #include "winhooks.h"
 #include "winhook_types.h"
-#include "commonconfig.h"
 #include "hooker.h"
 #include "logger.h"
 #include "memedit.h"

@@ -33,9 +33,6 @@
     <ClInclude Include="winhooks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="commonconfig.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ZXString.h">
       <Filter>Header Files\MapleTypes</Filter>
     </ClInclude>
