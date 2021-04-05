@@ -44,6 +44,7 @@ Regular injection can be done with the GenericLauncher project exe. This program
 ### Common Project
 The Common project contains all the Windows library hooks that are not version specific.  
 These can be used by any version and are already configured to be hooked on injection. They can be toggled on/off in the commonconfig file.
+There are also a number of Maple templates in this folder -- feel free to contribute yours!
 
 ### When does hooking and memory editing happen?
 Windows functions are hooked immediately after injection which happens directly after MapleStory is launched (for ijl proxy and regular GenericLauncher injection).  

@@ -71,13 +71,8 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="detours.lib">
-      <Filter>Resource Files</Filter>
-    </Library>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="FakeModule.cpp">
-      <Filter>FakeModule</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
