@@ -1,107 +1,122 @@
 #pragma once
+
+// Exclude rarely-used stuff from Windows headers
+// Important to define this before Windows.h is included in a project because of linker issues with the WinSock2 lib
+#define WIN32_LEAN_AND_MEAN
+
 #include <Windows.h>
+#include <functional>
 #include "hooker.h"
 #include "logger.h"
 #include "winhooks.h"
+#include "winhook_types.h"
+#include "FakeModule.h"
 
-struct Common
+#define MAPLE_USE_IJL TRUE
+
+/// <summary>
+/// 
+/// </summary>
+class Common
 {
-public:
-	Common(BOOL bHookWinLibs, PostMutexFunc_t pPostMutexFunc, const char* sIP, const char* sOriginalIP)
+private:
+	struct Config
 	{
-		Log("Common created => Hook winsock libs: %s || IP: %s || Original IP: %s", (bHookWinLibs ? "Yes" : "No"), sIP, sOriginalIP);
-
-		if (!pPostMutexFunc)
+	private:
+		struct WinHooks
 		{
-			Log("Invalid function pointer passed to Common constructor.");
-			return;
-		}
+			/* define toggles for logging and other behavior separately */
+		public:
+			const BOOL OpenMutexA_Spoof = TRUE;
 
-#if MAPLE_INSTAJECT
-		pPostMutexFunc(); // call post-unpack function right away
-#else
-		// set pointer to function that is executed after client unpacks itself
-		g_PostMutexFunc = pPostMutexFunc;
-#endif
+			const BOOL WSPConnect_Logging = TRUE;
+			const BOOL NtTerminateProc_Logging = TRUE;
+			const BOOL OpenProcess_Logging = FALSE;
+			const BOOL CreateProcess_Logging = TRUE;
+			const BOOL OpenMutexA_Logging = TRUE;
+			const BOOL RegCreateKeyA_Logging = FALSE;
+			const BOOL GetProcAddress_Logging = FALSE;
 
+			WinHooks() { }
+		};
+	public:
+		const char* DllName = "LEN.dll";
+		const char* MapleExeName = "MapleStory.exe";
+		const char* MapleStartupArgs = " GameLaunching 127.0.0.1 8484";
 
-		// required for proper injection
-		INITWINHOOK("KERNEL32", "CreateMutexA", CreateMutexA_Original, CreateMutexA_t, CreateMutexA_Hook);
+		const char* MapleExitWindowWebUrl = "http";
+		const char* MapleWindowClass = "MapleStoryClass";
+		const char* MaplePatcherClass = "StartUpDlgClass";
+		const char* MapleMutex = "WvsClientMtx";
 
-		if (MAPLE_PATCHER_CLASS)
-		{
-			INITWINHOOK("USER32", "CreateWindowExA", CreateWindowExA_Original, CreateWindowExA_t, CreateWindowExA_Hook);
-		}
+		const DWORD LocaleSpoofValue = 0;
+		const DWORD SleepAfterUnpackDuration = 0;
 
-		if (MAPLE_LOCALE_SPOOF)
-		{
-			INITWINHOOK("KERNEL32", "GetACP", GetACP_Original, GetACP_t, GetACP_Hook);
-		}
+		const BOOL  ForceWindowedOnStart = TRUE;
+		const BOOL  InjectImmediately = FALSE;
+		const BOOL  AllowMulticlient = TRUE;
 
-#if MAPLETRACKING_OPEN_PROC
-		INITWINHOOK("KERNEL32", "OpenProcess", OpenProcess_Original, OpenProcess_t, OpenProcess_Hook);
-#endif
+		Common::Config::WinHooks HookToggleInfo = { };
 
-#if MAPLETRACKING_CREATE_PROCESS
-		INITWINHOOK("KERNEL32", "CreateProcessW", CreateProcessW_Original, CreateProcessW_t, CreateProcessW_Hook);
-		INITWINHOOK("KERNEL32", "CreateProcessA", CreateProcessA_Original, CreateProcessA_t, CreateProcessA_Hook);
+		Config() { }
+	};
 
-#else
-		if (strlen(MAPLE_KILL_EXIT_WINDOW))
-		{
-			INITWINHOOK("KERNEL32", "CreateProcessA", CreateProcessA_Original, CreateProcessA_t, CreateProcessA_Hook);
-		}
-#endif
+private:
+	static Common* _s_pInstance;
+	static Common::Config* _s_pConfig;
 
-#if MAPLETRACKING_OPEN_MUTEXA
-		INITWINHOOK("KERNEL32", "OpenMutexA", OpenMutexA_Original, OpenMutexA_t, OpenMutexA_Hook);
-#endif
+public: // public because all the C-style hooks have to access these members
+	const char* m_sRedirectIP;
+	const char* m_sOriginalIP;
 
-#if MAPLETRACKING_NT_TERMINATE_PROC
-		INITWINHOOK("NTDLL", "NtTerminateProcess", NtTerminateProcess_Original, NtTerminateProcess_t, NtTerminateProcess_Hook);
-#endif
+	/* TODO throw all the winsock stuff into its own class */
+	SOCKET			m_GameSock;
+	WSPPROC_TABLE	m_ProcTable;
+	DWORD			m_dwGetProcRetAddr;
+	BOOL			m_bThemidaUnpacked;
+	FakeModule* m_pFakeHsModule;
 
-#if MAPLETRACKING_REGCREATEKEY
-		INITWINHOOK("KERNEL32", "RegCreateKeyExA", RegCreateKeyExA_Original, RegCreateKeyExA_t, RegCreateKeyExA_Hook);
-#endif
+	/// <summary>
+	/// Gets called when mutex hook is triggered.
+	/// </summary>
+	std::function<void()> m_PostMutexFunc;
 
-#if MAPLETRACKING_GETPROCADDR
-		INITWINHOOK("KERNEL32", "GetProcAddress", GetProcAddress_Original, GetProcAddress_t, GetProcAddress_Hook);
-#endif
+private: // forcing the class to only have one instance, created through CreateInstance
+	Common(BOOL bHookWinLibs, std::function<void()> pPostMutexFunc, const char* sIP, const char* sOriginalIP);
+	Common() = delete;
+	Common(const Common&) = delete;
+	Common& operator =(const Common&) = delete;
 
-		if (!bHookWinLibs) return;
+public:
+	~Common();
 
-		if (!sIP || !sOriginalIP)
-		{
-			Log("Null IP string passed to Common constructor.");
-			return;
-		}
+	/// <summary>
+	/// Function called from library hooks.
+	/// Most of the time this should be triggered by the Mutex hook, however, in the case that
+	/// the Mutex hook does not get triggered then this will be executed by CreateWindowExA
+	/// for redundancy. The contents of this function will only be executed once, even if both 
+	/// Mutex and CreateWindow hooks are called properly.
+	/// </summary>
+	void OnThemidaUnpack();
 
-		g_sRedirectIP = sIP;
-		g_sOriginalIP = sOriginalIP;
+public:
+	static void CreateInstance(BOOL bHookWinLibs, std::function<void()> pMutexFunc, const char* sIP, const char* sOriginalIP)
+	{
+		if (_s_pInstance) return;
 
-		// macro outputs error if hook fails
-		INITWINHOOK("MSWSOCK", "WSPStartup", WSPStartup_Original, WSPStartup_t, WSPStartup_Hook);
+		_s_pInstance = new Common(bHookWinLibs, pMutexFunc, sIP, sOriginalIP);
 	}
 
-	~Common()
+	static Common* GetInstance()
 	{
-		Log("Cleaning up common..");
+		return _s_pInstance;
+	}
 
-		if (g_FakeHsModule)
-		{
-			// TODO figure out some common library call to put this instead of in dll detach
-			// CLogo constructor is pretty good but its not a library call so idk
-			g_FakeHsModule->DeleteModule();
-		}
+	static Config* GetConfig()
+	{
+		if (!_s_pConfig) _s_pConfig = new Config();
 
-		if (g_GameSock != INVALID_SOCKET)
-		{
-			Log("Closing socket..");
-
-			g_ProcTable.lpWSPCloseSocket(g_GameSock, nullptr);
-			g_GameSock = INVALID_SOCKET;
-		}
+		return _s_pConfig;
 	}
 };
 

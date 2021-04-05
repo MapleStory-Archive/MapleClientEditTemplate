@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.30320.27
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GenericLauncher", "GenericLauncher\GenericLauncher.vcxproj", "{6E0B10D1-1A13-4C13-9F00-1525A7E53019}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3EB29228-1F83-4DD3-B3C5-0F284FD50F39} = {3EB29228-1F83-4DD3-B3C5-0F284FD50F39}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "Common\Common.vcxproj", "{3EB29228-1F83-4DD3-B3C5-0F284FD50F39}"
 EndProject

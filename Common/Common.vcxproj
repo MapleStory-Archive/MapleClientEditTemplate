@@ -172,6 +172,7 @@
     <ClInclude Include="memedit.h" />
     <ClInclude Include="TSecType.h" />
     <ClInclude Include="winhooks.h" />
+    <ClInclude Include="winhook_types.h" />
     <ClInclude Include="ZAllocAnonSelector.h" />
     <ClInclude Include="ZAllocBase.h" />
     <ClInclude Include="ZAllocEx.h" />
@@ -184,7 +185,10 @@
     <ClInclude Include="ZXString.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Common.cpp" />
     <ClCompile Include="FakeModule.cpp" />
+    <ClCompile Include="winhooks.cpp" />
+    <ClCompile Include="winhook_types.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

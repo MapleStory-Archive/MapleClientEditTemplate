@@ -121,6 +121,7 @@ public:
 		/* grab the top pointer off the stack */
 		PVOID* lpAllocRet = reinterpret_cast<PVOID*>(this->m_apBuff[nBlockSizeIndex]);
 
+#if _DEBUG
 		if ((DWORD) * (lpAllocRet - 1) > 0x400) // 1kb
 		{
 			auto p = lpAllocRet;
@@ -132,6 +133,7 @@ public:
 			Log("Address[1]:  %08X Value: %08X", p + 1, *(p + 1));
 			Log("Address[2]:  %08X Value: %08X", p + 2, *(p + 2));
 		}
+#endif
 
 		/* set the top of the stack to equal the previous pointer */
 		this->m_apBuff[nBlockSizeIndex] = *lpAllocRet;
@@ -309,6 +311,7 @@ public:
 		/* grab the top pointer off the stack */
 		PVOID* lpAllocRet = reinterpret_cast<PVOID*>(this->m_apBuff[nBlockSizeIndex]);
 
+#if _DEBUG
 		if ((DWORD) * (lpAllocRet - 1) > 0x400) // 1kb
 		{
 			auto p = lpAllocRet;
@@ -320,6 +323,7 @@ public:
 			Log("Address[1]:  %08X Value: %08X", p + 1, *(p + 1));
 			Log("Address[2]:  %08X Value: %08X", p + 2, *(p + 2));
 		}
+#endif
 
 		/* set the top of the stack to equal the previous pointer */
 		this->m_apBuff[nBlockSizeIndex] = *lpAllocRet;

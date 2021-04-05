@@ -1,7 +1,7 @@
+#include <Common.h> // has to be before Windows.h because of linker issues with winsock lib
 #include <Windows.h>
 #include <iostream>
 #include <io.h>
-#include "commonconfig.h"
 
 void ErrorBox(const char* format, ...)
 {
@@ -34,8 +34,8 @@ int main()
 
 	// Start the child process. 
 	BOOL bCreateProc = CreateProcess(
-		MAPLE_EXE_NAME,		// name of application
-		const_cast<LPSTR>(MAPLE_STARTUP_ARGS), // Command line args
+		Common::GetConfig()->MapleExeName,			// name of application
+		const_cast<LPSTR>(Common::GetConfig()->MapleStartupArgs), // Command line args
 		NULL,               // Process handle not inheritable
 		NULL,               // Thread handle not inheritable
 		FALSE,              // Set handle inheritance to FALSE
@@ -51,9 +51,9 @@ int main()
 #if !MAPLE_INJECT_USE_IJL
 		size_t nLoadDllStrLen;
 
-		if (MAPLE_INJECT_DLLNAME)
+		if (Common::GetConfig()->DllName)
 		{
-			nLoadDllStrLen = strlen(MAPLE_INJECT_DLLNAME);
+			nLoadDllStrLen = strlen(Common::GetConfig()->DllName);
 		}
 		else
 		{
@@ -82,7 +82,7 @@ int main()
 			ErrorBoxWithCode("Unable to allocate memory.");
 		}
 
-		BOOL bWriteProc = WriteProcessMemory(piMaple.hProcess, lpRemoteStr, MAPLE_INJECT_DLLNAME, nLoadDllStrLen, NULL);
+		BOOL bWriteProc = WriteProcessMemory(piMaple.hProcess, lpRemoteStr, Common::GetConfig()->DllName, nLoadDllStrLen, NULL);
 
 		if (!bWriteProc)
 		{

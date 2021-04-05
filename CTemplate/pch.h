@@ -7,6 +7,8 @@
 #ifndef PCH_H
 #define PCH_H
 
+#pragma warning (disable: 4727)
+
 // add headers that you want to pre-compile here
 #include "framework.h"
 #include "MapleAPI.h"

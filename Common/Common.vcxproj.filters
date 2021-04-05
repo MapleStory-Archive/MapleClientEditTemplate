@@ -84,10 +84,22 @@
     <ClInclude Include="ZAllocStrSelector.h">
       <Filter>Header Files\MapleTypes\ZAllocEx</Filter>
     </ClInclude>
+    <ClInclude Include="winhook_types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FakeModule.cpp">
       <Filter>FakeModule</Filter>
+    </ClCompile>
+    <ClCompile Include="winhook_types.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="winhooks.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

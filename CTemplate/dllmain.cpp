@@ -64,20 +64,18 @@ VOID MainFunc()
 // prolly don't edit this region if youre a noob
 #pragma region EntryThread
 
-// windows hooks are stored in here -> no need to mess with this normally
-static Common* CommonHooks;
-
 // main thread
 VOID MainProc()
 {
 	Log(__FUNCTION__);
 
-	CommonHooks = new Common(
-		TRUE,			// true if you want to hook windows libraries (besides mutex)
-						//		set this to false if you already edited your IP into the client (eg v83 localhosts)
-		&MainFunc,		// function to be executed after client is unpacked
-		"127.0.0.1",	// IP to connec to (your server IP)
-		"127.0.0.1");	// IP to redirect from (nexon IP)
+	Common::CreateInstance
+	(
+		TRUE,			// true if you want to hook windows libraries (besides mutex) set this to false if you already edited your IP into the client (eg v83 localhosts)
+		MainFunc,		// function to be executed after client is unpacked
+		"127.0.0.1",	// IP to connect to (your server IP)
+		"127.0.0.1"		// IP to redirect from (nexon IP)
+	);
 }
 
 // dll entry point
@@ -96,7 +94,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 	case DLL_PROCESS_DETACH:
 	{
 		Log("DLL_PROCESS_DETACH");
-		CommonHooks->~Common();
+		Common::GetInstance()->~Common();
 		break;
 	}
 	}
