@@ -172,6 +172,10 @@
     <ClInclude Include="memedit.h" />
     <ClInclude Include="TSecType.h" />
     <ClInclude Include="winhooks.h" />
+    <ClInclude Include="ZAllocAnonSelector.h" />
+    <ClInclude Include="ZAllocBase.h" />
+    <ClInclude Include="ZAllocEx.h" />
+    <ClInclude Include="ZAllocStrSelector.h" />
     <ClInclude Include="ZArray.h" />
     <ClInclude Include="ZList.h" />
     <ClInclude Include="ZMap.h" />

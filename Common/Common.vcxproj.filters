@@ -22,6 +22,9 @@
     <Filter Include="FakeModule">
       <UniqueIdentifier>{1987d19a-3c1d-45ff-bb93-51bc09536df4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\MapleTypes\ZAllocEx">
+      <UniqueIdentifier>{0194d71c-6d23-4669-a225-f03b551901e0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="detours.h">
@@ -69,10 +72,22 @@
     <ClInclude Include="FakeModule.h">
       <Filter>FakeModule</Filter>
     </ClInclude>
+    <ClInclude Include="ZAllocEx.h">
+      <Filter>Header Files\MapleTypes\ZAllocEx</Filter>
+    </ClInclude>
+    <ClInclude Include="ZAllocBase.h">
+      <Filter>Header Files\MapleTypes\ZAllocEx</Filter>
+    </ClInclude>
+    <ClInclude Include="ZAllocAnonSelector.h">
+      <Filter>Header Files\MapleTypes\ZAllocEx</Filter>
+    </ClInclude>
+    <ClInclude Include="ZAllocStrSelector.h">
+      <Filter>Header Files\MapleTypes\ZAllocEx</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FakeModule.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>FakeModule</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

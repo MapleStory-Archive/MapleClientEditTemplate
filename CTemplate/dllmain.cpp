@@ -4,11 +4,11 @@
 // in order to reference other projects you need to add:
 // $(SolutionDir)Common;%(AdditionalIncludeDirectories)
 // to project properties -> c/c++ -> additional include directories
-#include "memedit.h"
-#include "hooker.h"
-#include "Common.h"
-#include "winhooks.h"
 #include "ExampleHooks.h"
+#include <ZXString.h>
+#include <Common.h>
+#include <hooker.h>
+#include <memedit.h>
 
 // BE AWARE ===v
 // in order to fix the detours.lib link error you need to replace
@@ -22,7 +22,15 @@ VOID MainFunc()
 {
 	Log(__FUNCTION__);
 
-	// set hooks
+	ZXString<char> pCharTest = ZXString<char>("test");
+	pCharTest += " and another";
+
+	Log(pCharTest);
+
+	ZXString<wchar_t> pWCharTest = ZXString<wchar_t>(L"test");
+	pWCharTest += L" and another";
+
+	OutputDebugStringW(pWCharTest);
 
 	return;
 
