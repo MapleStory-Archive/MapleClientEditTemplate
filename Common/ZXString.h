@@ -118,7 +118,7 @@ public:
 	/// <param name="s">A T-sized char array to be assigned to an existing ZXString object.</param>
 	ZXString<T>* operator=(const T* s)
 	{
-		this->Assign(s);
+		this->Assign(s, -1);
 		return this;
 	}
 
@@ -371,10 +371,11 @@ public:
 
 			T* pBuff = this->GetBuffer(nCap, TRUE);
 
-			int nStrStartIdx = sizeof(T) * this->Length();
 			int nByteLength = sizeof(T) * nLen;
 
-			memcpy(&pBuff[nStrStartIdx], s, nByteLength);
+			/* length is starting index, compiler automatically adjusts for size of T when getting buffer index */
+			memcpy(&pBuff[this->Length()], s, nByteLength);
+
 			this->ReleaseBuffer(i);
 		}
 
