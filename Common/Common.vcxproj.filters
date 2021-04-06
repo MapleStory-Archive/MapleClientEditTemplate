@@ -30,9 +30,6 @@
     <ClInclude Include="detours.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="winhooks.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ZXString.h">
       <Filter>Header Files\MapleTypes</Filter>
     </ClInclude>
@@ -81,8 +78,11 @@
     <ClInclude Include="ZAllocStrSelector.h">
       <Filter>Header Files\MapleTypes\ZAllocEx</Filter>
     </ClInclude>
+    <ClInclude Include="winhooks.h">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
     <ClInclude Include="winhook_types.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Tools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -96,6 +96,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Common.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="hooker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="memedit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

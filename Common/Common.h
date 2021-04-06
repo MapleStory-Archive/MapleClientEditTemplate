@@ -27,17 +27,27 @@ private:
 		{
 			/* define toggles for logging and other behavior separately */
 		public:
-			const BOOL OpenMutexA_Spoof = TRUE;
+			BOOL OpenMutexA_Spoof;
 
-			const BOOL WSPConnect_Logging = TRUE;
-			const BOOL NtTerminateProc_Logging = TRUE;
-			const BOOL OpenProcess_Logging = FALSE;
-			const BOOL CreateProcess_Logging = TRUE;
-			const BOOL OpenMutexA_Logging = TRUE;
-			const BOOL RegCreateKeyA_Logging = FALSE;
-			const BOOL GetProcAddress_Logging = FALSE;
+			BOOL WSPConnect_Logging;
+			BOOL NtTerminateProc_Logging;
+			BOOL OpenProcess_Logging;
+			BOOL CreateProcess_Logging;
+			BOOL OpenMutexA_Logging;
+			BOOL RegCreateKeyA_Logging;
+			BOOL GetProcAddress_Logging;
 
-			WinHooks() { }
+			WinHooks()
+			{
+				OpenMutexA_Spoof = TRUE;
+				WSPConnect_Logging = TRUE;
+				NtTerminateProc_Logging = TRUE;
+				OpenProcess_Logging = FALSE;
+				CreateProcess_Logging = TRUE;
+				OpenMutexA_Logging = TRUE;
+				RegCreateKeyA_Logging = FALSE;
+				GetProcAddress_Logging = FALSE;
+			}
 		};
 	public:
 		const char* DllName = "LEN.dll";
@@ -49,16 +59,25 @@ private:
 		const char* MaplePatcherClass = "StartUpDlgClass";
 		const char* MapleMutex = "WvsClientMtx";
 
-		const DWORD LocaleSpoofValue = 0;
-		const DWORD SleepAfterUnpackDuration = 0;
+		DWORD LocaleSpoofValue;
+		DWORD SleepAfterUnpackDuration;
 
-		const BOOL  ForceWindowedOnStart = TRUE;
-		const BOOL  InjectImmediately = FALSE;
-		const BOOL  AllowMulticlient = TRUE;
+		BOOL  ForceWindowedOnStart;
+		BOOL  InjectImmediately;
+		BOOL  AllowMulticlient;
 
-		Common::Config::WinHooks HookToggleInfo = { };
+		Common::Config::WinHooks HookToggleInfo;
 
-		Config() { }
+		Config()
+		{
+			HookToggleInfo = WinHooks();
+
+			LocaleSpoofValue = 0;
+			SleepAfterUnpackDuration = 0;
+			ForceWindowedOnStart = TRUE;
+			InjectImmediately = FALSE;
+			AllowMulticlient = TRUE;
+		}
 	};
 
 private:
