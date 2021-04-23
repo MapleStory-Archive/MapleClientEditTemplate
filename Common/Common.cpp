@@ -12,16 +12,6 @@ Common::Common(BOOL bHookWinLibs, std::function<void()> pPostMutexFunc, const ch
 	this->m_bThemidaUnpacked = FALSE;
 	this->m_dwGetProcRetAddr = 0;
 
-#if MAPLE_INSTAJECT // call post-unpack function right away
-	pPostMutexFunc();
-#else				// set pointer to function that is executed after client unpacks itself
-	this->m_PostMutexFunc = pPostMutexFunc;
-#endif
-
-#if _DEBUG
-	Log("Common created => Hook winsock libs: %s || IP: %s || Original IP: %s", (bHookWinLibs ? "Yes" : "No"), sIP, sOriginalIP);
-#endif
-
 	if (!pPostMutexFunc)
 	{
 #if _DEBUG
@@ -29,6 +19,19 @@ Common::Common(BOOL bHookWinLibs, std::function<void()> pPostMutexFunc, const ch
 #endif
 		return;
 	}
+
+	if (this->GetConfig()->InjectImmediately) // call post-unpack function right away
+	{
+		pPostMutexFunc();
+	}
+	else // set pointer to function that is executed after client unpacks itself
+	{
+		this->m_PostMutexFunc = pPostMutexFunc;
+	}
+
+#if _DEBUG
+	Log("Common created => Hook winsock libs: %s || IP: %s || Original IP: %s", (bHookWinLibs ? "Yes" : "No"), sIP, sOriginalIP);
+#endif
 
 	// required for proper injection
 	INITWINHOOK("KERNEL32", "CreateMutexA", CreateMutexA_Original, CreateMutexA_t, WinHooks::CreateMutexA_Hook);
