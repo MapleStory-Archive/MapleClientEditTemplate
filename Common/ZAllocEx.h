@@ -9,6 +9,7 @@
 #include <thread>
 #include <windows.h>
 #include <heapapi.h>
+#include "ZFatalSection.h"
 
 // fix returnaddress func
 // https://docs.microsoft.com/en-us/cpp/intrinsics/returnaddress?view=msvc-160
@@ -32,23 +33,20 @@ struct ZAllocEx<ZAllocAnonSelector> : ZAllocBase, ZAllocAnonSelector
 {
 private:
 	BYTE gap0[1];
-	PVOID m_lock[2]; // ZFatalSection size == 8 bytes <-- we don't use this but I kept it so the class can be swapped into a maple program seamlessly
+	ZFatalSection m_lock; // we dont use this but we keep it for proper maple struct alignment
 	LPVOID m_apBuff[4];
 	LPVOID m_apBlockHead[4];
 
-	static std::mutex* GetMutex()
+	std::mutex* GetMutex()
 	{
-		static std::mutex* mtx = new std::mutex;
+		static std::mutex mtx;
 
-		return mtx;
+		return &mtx;
 	}
 
-public:
 	ZAllocEx()
 	{
 		gap0[0] = 0;
-		m_lock[0] = 0;
-		m_lock[1] = 0;
 
 		for (int i = 0; i < 4; i++)
 		{
@@ -57,6 +55,18 @@ public:
 		}
 	}
 
+	/* ZAlloc instantiation has to used malloc because it cant initialize itself */
+	void* operator new(unsigned int uSize)
+	{
+		return malloc(uSize);
+	}
+
+	void operator delete(void* p)
+	{
+		free(p);
+	}
+
+public:
 	static ZAllocEx<ZAllocAnonSelector>* GetInstance()
 	{
 		static ZAllocEx<ZAllocAnonSelector> _s_ZAllocEx = ZAllocEx();
@@ -132,7 +142,7 @@ public:
 			Log("Address[0]:  %08X Value: %08X", p, *(p));
 			Log("Address[1]:  %08X Value: %08X", p + 1, *(p + 1));
 			Log("Address[2]:  %08X Value: %08X", p + 2, *(p + 2));
-		}
+	}
 #endif
 
 		/* set the top of the stack to equal the previous pointer */
@@ -142,7 +152,7 @@ public:
 
 		/* return memory */
 		return lpAllocRet;
-	}
+}
 
 	void Free(void** p)
 	{
@@ -189,10 +199,10 @@ public:
 				Log("Address[0]:  %08X Value: %08X", p, *(p));
 				Log("Address[1]:  %08X Value: %08X", p + 1, *(p + 1));
 				Log("Address[2]:  %08X Value: %08X", p + 2, *(p + 2));
-			}
+		}
 #endif
 			return;
-		}
+	}
 
 		GetMutex()->lock();
 
@@ -222,23 +232,19 @@ struct ZAllocEx<ZAllocStrSelector<T>> : ZAllocBase, ZAllocStrSelector<T>
 {
 private:
 	BYTE gap0[1];
-	PVOID m_lock[2]; // ZFatalSection size == 8 bytes <-- we don't use this but I kept it so the class can be swapped into a maple program seamlessly
+	ZFatalSection m_lock; // we dont use this but we keep it for proper maple struct alignment
 	LPVOID m_apBuff[4];
 	LPVOID m_apBlockHead[4];
 
-	static std::mutex* GetMutex()
+	std::mutex* GetMutex()
 	{
-		static std::mutex* mtx = new std::mutex;
-
-		return mtx;
+		static std::mutex mtx;
+		return &mtx;
 	}
 
-public:
 	ZAllocEx()
 	{
 		gap0[0] = 0;
-		m_lock[0] = 0;
-		m_lock[1] = 0;
 
 		for (int i = 0; i < 4; i++)
 		{
@@ -247,10 +253,21 @@ public:
 		}
 	}
 
+	/* ZAlloc instantiation has to used malloc because it cant initialize itself */
+	void* operator new(unsigned int uSize)
+	{
+		return malloc(uSize);
+	}
+
+	void operator delete(void* p)
+	{
+		free(p);
+	}
+
+public:
 	static ZAllocEx<ZAllocStrSelector<T>>* GetInstance()
 	{
 		static ZAllocEx<ZAllocStrSelector<T>> _s_ZAllocEx = ZAllocEx();
-
 		return &_s_ZAllocEx;
 	}
 
@@ -322,7 +339,7 @@ public:
 			Log("Address[0]:  %08X Value: %08X", p, *(p));
 			Log("Address[1]:  %08X Value: %08X", p + 1, *(p + 1));
 			Log("Address[2]:  %08X Value: %08X", p + 2, *(p + 2));
-		}
+	}
 #endif
 
 		/* set the top of the stack to equal the previous pointer */
@@ -332,7 +349,7 @@ public:
 
 		/* return memory */
 		return lpAllocRet;
-	}
+}
 
 	void Free(void** p)
 	{
@@ -379,10 +396,10 @@ public:
 				Log("Address[0]:  %08X Value: %08X", p, *(p));
 				Log("Address[1]:  %08X Value: %08X", p + 1, *(p + 1));
 				Log("Address[2]:  %08X Value: %08X", p + 2, *(p + 2));
-			}
+		}
 #endif
 			return;
-		}
+	}
 
 		GetMutex()->lock();
 
@@ -395,6 +412,29 @@ public:
 		GetMutex()->unlock();
 	}
 };
+
+/* Global memory management overloading */
+
+void* operator new(size_t uSize)
+{
+	Log("returning size of %d", uSize);
+	return ZAllocEx<ZAllocAnonSelector>::GetInstance()->Alloc(uSize);
+}
+
+void* operator new[](size_t uSize)
+{
+	return ZAllocEx<ZAllocAnonSelector>::GetInstance()->Alloc(uSize);
+}
+
+void operator delete(void* p)
+{
+	ZAllocEx<ZAllocAnonSelector>::GetInstance()->Free((void**)p);
+}
+
+void operator delete[](void* p)
+{
+	ZAllocEx<ZAllocAnonSelector>::GetInstance()->Free((void**)p);
+}
 
 assert_size(sizeof(ZAllocEx<ZAllocAnonSelector>), 0x2C)
 assert_size(sizeof(ZAllocEx<ZAllocStrSelector<char>>), 0x2C)
