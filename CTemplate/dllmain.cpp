@@ -22,16 +22,6 @@ VOID MainFunc()
 {
 	Log(__FUNCTION__);
 
-	ZXString<char> pCharTest = ZXString<char>("test");
-	pCharTest += " and another";
-
-	Log(pCharTest);
-
-	ZXString<wchar_t> pWCharTest = ZXString<wchar_t>(L"test");
-	pWCharTest += L" and another";
-
-	OutputDebugStringW(pWCharTest);
-
 	return;
 
 	// below hooks only serve as examples -- they will not do anything as-is

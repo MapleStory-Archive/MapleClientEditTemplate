@@ -25,18 +25,18 @@
     <Filter Include="Header Files\MapleTypes\ZAllocEx">
       <UniqueIdentifier>{0194d71c-6d23-4669-a225-f03b551901e0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\MapleTypes\ZRef">
+      <UniqueIdentifier>{ae38652d-82f0-4033-9927-3e1e372f46c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MapleTypes\ZRecycleable">
+      <UniqueIdentifier>{3cb1c63c-3e12-4bf9-8b34-faa933169f29}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="detours.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ZXString.h">
-      <Filter>Header Files\MapleTypes</Filter>
-    </ClInclude>
-    <ClInclude Include="ZRef.h">
-      <Filter>Header Files\MapleTypes</Filter>
-    </ClInclude>
-    <ClInclude Include="ZRecycleable.h">
       <Filter>Header Files\MapleTypes</Filter>
     </ClInclude>
     <ClInclude Include="ZMap.h">
@@ -83,6 +83,30 @@
     </ClInclude>
     <ClInclude Include="winhook_types.h">
       <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="ZFatalSection.h">
+      <Filter>Header Files\MapleTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="ZRef.h">
+      <Filter>Header Files\MapleTypes\ZRef</Filter>
+    </ClInclude>
+    <ClInclude Include="ZRefCounted.h">
+      <Filter>Header Files\MapleTypes\ZRef</Filter>
+    </ClInclude>
+    <ClInclude Include="ZRefCountedDummy.h">
+      <Filter>Header Files\MapleTypes\ZRef</Filter>
+    </ClInclude>
+    <ClInclude Include="ZRecyclableStatic.h">
+      <Filter>Header Files\MapleTypes\ZRecycleable</Filter>
+    </ClInclude>
+    <ClInclude Include="ZRecyclableAvBuffer.h">
+      <Filter>Header Files\MapleTypes\ZRecycleable</Filter>
+    </ClInclude>
+    <ClInclude Include="ZRecyclable.h">
+      <Filter>Header Files\MapleTypes\ZRecycleable</Filter>
+    </ClInclude>
+    <ClInclude Include="ZRefCountedAccessor.h">
+      <Filter>Header Files\MapleTypes\ZRef</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

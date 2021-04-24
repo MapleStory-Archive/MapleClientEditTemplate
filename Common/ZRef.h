@@ -1,46 +1,48 @@
 #pragma once
-#include "ZRecycleable.h"
+#include "logger.h"
+#include "ZRefCounted.h"
+#include "ZRefCountedDummy.h"
+#include "ZRefCountedAccessor.h"
 
-template <typename T>
-struct ZRef
+template <class T>
+class ZRef : protected ZRefCountedAccessor<T>, protected ZRefCountedAccessor<ZRefCountedDummy<T>>
 {
 private:
-	char aPad[4];
-public:
+	BYTE gap0[1];
 	T* p;
-};
 
-class ZRefCounted
-{
 public:
-
-	ZRefCounted()
+	ZRef()
 	{
-		this->m_nRef = 0;
-		this->m_pPrev = 0;
+		
 	}
 
-	virtual ~ZRefCounted()
+	~ZRef()
 	{
-		//TODO: ?
+		this->ReleaseRaw();
 	}
 
-	union
+private:
+	void ReleaseRaw()
 	{
-		long m_nRef;
-		ZRefCounted* m_pNext;
-	};
+		if (!this->p) return;
 
-	ZRefCounted* m_pPrev;
-};
+		ZRefCounted* t;// = dynamic_cast<ZRefCounted*>(this->p);
 
-template <typename T>
-class ZRefCountedDummy : public ZRefCounted, public ZRecyclable<ZRefCountedDummy<T>, int, T>
-{
-public:
-	T pData;
+		/*if (t)
+		{*/
+			t = reinterpret_cast<ZRefCounted*>(((char*)this) - 16);
+		//}
+
+		if (!InterlockedDecrement(&t->m_nRef))
+		{
+			InterlockedIncrement(&t->m_nRef);
+
+			t->~ZRefCounted();
+		}
+
+		this->p = nullptr;
+	}
 };
 
 assert_size(sizeof(ZRef<int>), 0x08);
-assert_size(sizeof(ZRefCounted), 0x0C);
-assert_size(sizeof(ZRefCountedDummy<int>), 0x14);

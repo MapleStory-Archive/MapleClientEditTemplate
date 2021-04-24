@@ -1,7 +1,8 @@
 #pragma once
 
-struct ZAllocBase
+class ZAllocBase
 {
+public:
 	enum BLOCK_SIZE
 	{
 		BLOCK16 = 0,
@@ -9,8 +10,8 @@ struct ZAllocBase
 		BLOCK64 = 2,
 		BLOCK128 = 3,
 	};
-protected:
-	PVOID* AllocRawBlocks(UINT uBlockSize, UINT uNumberOfBlocks)
+
+	static PVOID* AllocRawBlocks(UINT uBlockSize, UINT uNumberOfBlocks)
 	{
 		/* TODO make this more legible */
 
