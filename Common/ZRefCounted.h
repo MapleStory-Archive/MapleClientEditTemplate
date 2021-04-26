@@ -15,7 +15,7 @@ public:
 
 	union
 	{
-		volatile unsigned long m_nRef;
+		volatile long m_nRef;
 		ZRefCounted* m_pNext;
 	};
 

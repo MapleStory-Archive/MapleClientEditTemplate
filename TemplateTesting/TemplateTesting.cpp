@@ -7,12 +7,18 @@
 #include "ZRefCountedDummy.h"
 #include "ZRef.h"
 
+struct poo : ZRefCounted
+{
+	int o;
+};
+
 int main()
 {
-	auto p1 = ZRefCounted_Alloc<int>();
-	auto p2 = ZRefCounted_Alloc<ZRefCountedDummy<int>>();
+	ZRef<poo>* p2 = new ZRef<poo>();
+	ZRef<ZXString<char>>* p3 = new ZRef<ZXString<char>>();
 
-	auto p3 = new ZRef<ZXString<char>>;
+	p2->Alloc();
+	p3->Alloc();
 
 	
 
