@@ -6,10 +6,9 @@
 #include <type_traits>
 
 // ZRef is a smart pointer wrapper class that MapleStory uses to manage memory.
-// There's the main ZRef template, which wraps any pointer in a ZRefCountedDummy shell
-// And then there's the ZRef<ZRefCounted> specialization template that takes all objects
-//	that are already a ZRefCounted object. There are many of these. A significant amount of
-//	MapleStory classes are objects derived from ZRefCounted.
+// If the object passed to the ZRef template is a ZRefCounted object, it will treat it normally,
+//	otherwise it will add ZRefCountedDummy as an additional wrapper level to simulate a
+//	ZRefCounted derived class.
 
 template <class T>
 class ZRef : protected ZRefCountedAccessor<T>, protected ZRefCountedAccessor<ZRefCountedDummy<T>>
