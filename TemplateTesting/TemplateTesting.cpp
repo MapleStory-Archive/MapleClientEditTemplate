@@ -7,41 +7,18 @@
 #include "ZRefCountedDummy.h"
 #include "ZRef.h"
 
-struct poo : ZRefCounted
-{
-	int o;
-};
-
 int main()
 {
-	ZRef<ZRefCounted> p1 = ZRef<ZRefCounted>(); // works
+	auto* p10 = new ZRef<long>();
+	p10->Alloc();
 
-	p1.Alloc();
+	auto p20 = ZRef<long>(p10);
+	auto p30 = ZRef<long>(p10);
+	auto p40 = ZRef<long>(p10);
+	auto p50 = ZRef<long>(p10);
+	auto p60 = ZRef<long>(p10);
 
-	poo x;
-	ZRef<poo> y;
-
-	ZRef<poo> p2 = ZRef<poo>(&x); // works
-	ZRef<poo> p3 = ZRef<poo>(&y); // works
-
-	ZRef<ZRefCounted> p4 = ZRef<ZRefCounted>(p1); // this doesnt work????
-
-	/*ZRef<poo> p3 = ZRef<poo>(p1);
-	ZRef<poo> p4 = ZRef<poo>(p1);
-	ZRef<poo> p5 = ZRef<poo>(p1);
-	ZRef<poo> p6 = ZRef<poo>(p1);*/
-
-
-
-	auto p10 = new ZRef<long>();
-	auto p20 = new ZRef<long>();
-	auto p30 = new ZRef<long>();
-	auto p40 = new ZRef<long>();
-	auto p50 = new ZRef<long>();
-	auto p60 = new ZRef<long>();
-
-
-
+	p10->~ZRef();
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

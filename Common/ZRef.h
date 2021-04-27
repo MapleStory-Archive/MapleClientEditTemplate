@@ -16,7 +16,6 @@ class ZRef : protected ZRefCountedAccessor<T>, protected ZRefCountedAccessor<ZRe
 private:
 	BYTE gap0[1];
 	T* p;
-
 public:
 
 	ZRef()
@@ -170,7 +169,7 @@ private:
 
 		ZRefCounted* pBase = this->GetBase();
 
-		if (!InterlockedDecrement(&pBase->m_nRef))
+		if (InterlockedDecrement(&pBase->m_nRef) <= 0)
 		{
 			InterlockedIncrement(&pBase->m_nRef);
 
