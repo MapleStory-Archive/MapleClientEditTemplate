@@ -1,46 +1,205 @@
 #pragma once
-#include "ZRecycleable.h"
+#include "logger.h"
+#include "ZRefCounted.h"
+#include "ZRefCountedDummy.h"
+#include "ZRefCountedAccessor.h"
+#include <type_traits>
 
-template <typename T>
-struct ZRef
+// ZRef is a smart pointer wrapper class that MapleStory uses to manage memory.
+// If the object passed to the ZRef template is a ZRefCounted object, it will treat it normally,
+//	otherwise it will add ZRefCountedDummy as an additional wrapper level to simulate a
+//	ZRefCounted derived class.
+
+template <class T>
+class ZRef : protected ZRefCountedAccessor<T>, protected ZRefCountedAccessor<ZRefCountedDummy<T>>
 {
 private:
-	char aPad[4];
-public:
+	BYTE gap0[1];
 	T* p;
-};
-
-class ZRefCounted
-{
 public:
 
-	ZRefCounted()
+	ZRef()
 	{
-		this->m_nRef = 0;
-		this->m_pPrev = 0;
+		this->gap0[0] = NULL;
+		this->p = nullptr;
 	}
 
-	virtual ~ZRefCounted()
+	ZRef(ZRefCounted* pT, BOOL bAddRef = TRUE)
 	{
-		//TODO: ?
+		if (!pT)
+		{
+			this->p = nullptr;
+		}
+		else
+		{
+			this->p = reinterpret_cast<T*>(pT);
+
+			if (bAddRef)
+			{
+				InterlockedIncrement(&pT->m_nRef); // (this->p - 12)
+			}
+		}
 	}
 
-	union
+	ZRef(ZRef<T>* r)
 	{
-		long m_nRef;
-		ZRefCounted* m_pNext;
-	};
+		ZRefCounted* pBase;
 
-	ZRefCounted* m_pPrev;
-};
+		this->p = r->p;
 
-template <typename T>
-class ZRefCountedDummy : public ZRefCounted, public ZRecyclable<ZRefCountedDummy<T>, int, T>
-{
-public:
-	T pData;
+		if (r->p)
+		{
+			ZRefCounted* pBase = r->GetBase();
+
+			InterlockedIncrement(&pBase->m_nRef); // (this->p - 12)
+		}
+	}
+
+	~ZRef()
+	{
+		this->ReleaseRaw();
+	}
+
+	/// <summary>
+	/// Allocate resources for encapsulated pointer and initialize type.
+	/// </summary>
+	void Alloc()
+	{
+		this->ReleaseRaw();
+
+		/* is_base_of was released in c++11, so maple did this some other way */
+		if (std::is_base_of<ZRefCounted, T>())
+		{
+			ZRefCounted* pAlloc = reinterpret_cast<ZRefCounted*>(new T());
+
+			pAlloc->m_nRef = 1;
+			this->p = reinterpret_cast<T*>(pAlloc);
+		}
+		else
+		{
+			ZRefCountedDummy<T>* pAlloc = new ZRefCountedDummy<T>();// ZRefCounted_Alloc<ZRefCountedDummy<T>>();
+
+			pAlloc->m_nRef = 1;
+			this->p = &pAlloc->t;
+		}
+	}
+
+	/// <summary>
+	/// Set this ZRef pointer equal to the given pointer. Only works for ZRefCounted types.
+	/// </summary>
+	ZRef<T>* operator=(ZRefCounted* pT)
+	{
+		if (pT)
+		{
+			InterlockedIncrement(&pT->m_nRef);
+		}
+
+		this->p = pT;
+
+		if (this->p && !InterlockedDecrement(&this->m_nRef))
+		{
+			InterlockedIncrement(&this->m_nRef);
+
+			delete p; // v3->vfptr->__vecDelDtor(v3, 1u);
+		}
+
+		return this;
+	}
+
+	/// <summary>
+	/// Set this ZRef equal to the given ZRef
+	/// </summary>
+	ZRef<T>* operator=(ZRef<T>* r)
+	{
+		ZRefCounted* pBase;
+
+		if (r->p)
+		{
+			ZRefCounted* pBase = r->GetBase();
+			InterlockedIncrement(&pBase->m_nRef);
+		}
+
+		this->ReleaseRaw();
+
+		this->p = r->p;
+
+		return this;
+	}
+
+	/// <summary>
+	/// Release pointer resources.
+	/// </summary>
+	ZRef<T>* operator=(int zero)
+	{
+		this->ReleaseRaw();
+		return this;
+	}
+
+	/// <summary>
+	/// Fetch pointer to encapsulated object.
+	/// </summary>
+	operator T* ()
+	{
+		return this->p;
+	}
+
+	/// <summary>
+	/// Fetch pointer to encapsulated object.
+	/// </summary>
+	T* operator->()
+	{
+		return this->p;
+	}
+
+	/// <summary>
+	/// Determine if encapsulated pointer is null.
+	/// </summary>
+	BOOL operator!()
+	{
+		return this->p == nullptr;
+	}
+
+private:
+	/// <summary>
+	/// Decrement pointer reference count and release resources if references are zero.
+	/// </summary>
+	void ReleaseRaw()
+	{
+		if (!this->p) return;
+
+		ZRefCounted* pBase = this->GetBase();
+
+		if (InterlockedDecrement(&pBase->m_nRef) <= 0)
+		{
+			InterlockedIncrement(&pBase->m_nRef);
+
+			delete pBase; // if (v3) (**v3)(v3, 1);
+		}
+
+		this->p = nullptr;
+	}
+
+	/// <summary>
+	/// Returns the associated ZRefCounted object pointer.
+	/// </summary>
+	ZRefCounted* GetBase()
+	{
+		ZRefCounted* pBase;
+
+		/* is_base_of was released in c++11, so maple did this some other way */
+		if (std::is_base_of<ZRefCounted, T>())
+		{
+			pBase = reinterpret_cast<ZRefCounted*>(this->p);
+		}
+		else
+		{
+			pBase = reinterpret_cast<ZRefCounted*>(((char*)this->p) - (sizeof(ZRefCountedDummy<T>) - sizeof(T)));
+
+			static_assert(sizeof(ZRefCountedDummy<T>) - sizeof(T) == 16, "Size is not expected value");
+		}
+
+		return pBase;
+	}
 };
 
 assert_size(sizeof(ZRef<int>), 0x08);
-assert_size(sizeof(ZRefCounted), 0x0C);
-assert_size(sizeof(ZRefCountedDummy<int>), 0x14);

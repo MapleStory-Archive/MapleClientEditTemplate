@@ -3,14 +3,22 @@
 
 #include <iostream>
 #include "ZXString.h"
+#include "ZRefCounted.h"
+#include "ZRefCountedDummy.h"
+#include "ZRef.h"
 
 int main()
 {
-    ZXString<char> str = "lower";
+	auto* p10 = new ZRef<long>();
+	p10->Alloc();
 
+	auto p20 = ZRef<long>(p10);
+	auto p30 = ZRef<long>(p10);
+	auto p40 = ZRef<long>(p10);
+	auto p50 = ZRef<long>(p10);
+	auto p60 = ZRef<long>(p10);
 
-
-    std::cout << "Hello World!\n";
+	p10->~ZRef();
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

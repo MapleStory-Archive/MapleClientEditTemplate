@@ -180,25 +180,6 @@ public:
 		return this->m_pStr;
 	}
 
-	/// <summary>
-	/// Maple objects must be initialized using the ZAlloc structure if they are to be passed to the MapleStory executable (IE used outside of this dll).
-	/// </summary>
-	/// <param name="uSize">Size of the ZXString object to allocate.</param>
-	/// <returns>Pointer to the new ZXString object</returns>
-	void* operator new(size_t uSize)
-	{
-		return ZAllocEx<ZAllocAnonSelector>::GetInstance()->Alloc(uSize);
-	}
-
-	/// <summary>
-	/// Objects allocated with ZAllocEx must also be deallocated through ZAllocEx.
-	/// </summary>
-	/// <param name="p">Pointer to ZXString object to deallocate</param>
-	void operator delete(void* p)
-	{
-		ZAllocEx<ZAllocAnonSelector>::GetInstance()->Free((void**)p);
-	}
-
 	// ------------------------------------------------------ Public Member Functions
 
 	/// <summary>

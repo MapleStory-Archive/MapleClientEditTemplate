@@ -177,10 +177,16 @@
     <ClInclude Include="ZAllocEx.h" />
     <ClInclude Include="ZAllocStrSelector.h" />
     <ClInclude Include="ZArray.h" />
+    <ClInclude Include="ZFatalSection.h" />
     <ClInclude Include="ZList.h" />
     <ClInclude Include="ZMap.h" />
-    <ClInclude Include="ZRecycleable.h" />
+    <ClInclude Include="ZRecyclable.h" />
+    <ClInclude Include="ZRecyclableAvBuffer.h" />
+    <ClInclude Include="ZRecyclableStatic.h" />
     <ClInclude Include="ZRef.h" />
+    <ClInclude Include="ZRefCounted.h" />
+    <ClInclude Include="ZRefCountedAccessor.h" />
+    <ClInclude Include="ZRefCountedDummy.h" />
     <ClInclude Include="ZXString.h" />
   </ItemGroup>
   <ItemGroup>
