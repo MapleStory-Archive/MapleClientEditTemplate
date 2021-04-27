@@ -7,7 +7,7 @@ template <class T>
 class ZRefCountedDummy : public ZRefCounted, public ZRecyclable<ZRefCountedDummy<T>, 16, T>
 {
 public:
-	T t; // TODO remove public exposure
+	T t;
 
 	void* operator new(unsigned int uSize)
 	{

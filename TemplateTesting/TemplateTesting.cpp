@@ -14,15 +14,34 @@ struct poo : ZRefCounted
 
 int main()
 {
-	ZRef<poo>* p2 = new ZRef<poo>();
-	ZRef<ZXString<char>>* p3 = new ZRef<ZXString<char>>();
+	ZRef<ZRefCounted> p1 = ZRef<ZRefCounted>(); // works
 
-	p2->Alloc();
-	p3->Alloc();
+	p1.Alloc();
 
-	
+	poo x;
+	ZRef<poo> y;
 
-	p3->~ZRef();
+	ZRef<poo> p2 = ZRef<poo>(&x); // works
+	ZRef<poo> p3 = ZRef<poo>(&y); // works
+
+	ZRef<ZRefCounted> p4 = ZRef<ZRefCounted>(p1); // this doesnt work????
+
+	/*ZRef<poo> p3 = ZRef<poo>(p1);
+	ZRef<poo> p4 = ZRef<poo>(p1);
+	ZRef<poo> p5 = ZRef<poo>(p1);
+	ZRef<poo> p6 = ZRef<poo>(p1);*/
+
+
+
+	auto p10 = new ZRef<long>();
+	auto p20 = new ZRef<long>();
+	auto p30 = new ZRef<long>();
+	auto p40 = new ZRef<long>();
+	auto p50 = new ZRef<long>();
+	auto p60 = new ZRef<long>();
+
+
+
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

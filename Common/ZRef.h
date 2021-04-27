@@ -18,26 +18,26 @@ private:
 	T* p;
 
 public:
+
 	ZRef()
 	{
+		this->gap0[0] = NULL;
 		this->p = nullptr;
 	}
 
-	ZRef(T* pT, BOOL bAddRef)
+	ZRef(ZRefCounted* pT, BOOL bAddRef = TRUE)
 	{
-		if (!pT || !*pT) // TODO determine what this second conditional is really doing in IDA
+		if (!pT)
 		{
 			this->p = nullptr;
 		}
 		else
 		{
-			this->p = pT;
+			this->p = reinterpret_cast<T*>(pT);
 
 			if (bAddRef)
 			{
-				ZRefCounted* pBase = this->GetBase();
-
-				InterlockedIncrement(&pBase->m_nRef); // (this->p - 12)
+				InterlockedIncrement(&pT->m_nRef); // (this->p - 12)
 			}
 		}
 	}
@@ -61,6 +61,9 @@ public:
 		this->ReleaseRaw();
 	}
 
+	/// <summary>
+	/// Allocate resources for encapsulated pointer and initialize type.
+	/// </summary>
 	void Alloc()
 	{
 		this->ReleaseRaw();
@@ -68,21 +71,99 @@ public:
 		/* is_base_of was released in c++11, so maple did this some other way */
 		if (std::is_base_of<ZRefCounted, T>())
 		{
-			ZRefCounted* pAlloc = reinterpret_cast<ZRefCounted*>(ZRefCounted_Alloc<T>());
+			ZRefCounted* pAlloc = reinterpret_cast<ZRefCounted*>(new T());
 
 			pAlloc->m_nRef = 1;
 			this->p = reinterpret_cast<T*>(pAlloc);
 		}
 		else
 		{
-			ZRefCountedDummy<T>* pAlloc = ZRefCounted_Alloc<ZRefCountedDummy<T>>();
+			ZRefCountedDummy<T>* pAlloc = new ZRefCountedDummy<T>();// ZRefCounted_Alloc<ZRefCountedDummy<T>>();
 
 			pAlloc->m_nRef = 1;
 			this->p = &pAlloc->t;
 		}
 	}
 
+	/// <summary>
+	/// Set this ZRef pointer equal to the given pointer. Only works for ZRefCounted types.
+	/// </summary>
+	ZRef<T>* operator=(ZRefCounted* pT)
+	{
+		if (pT)
+		{
+			InterlockedIncrement(&pT->m_nRef);
+		}
+
+		this->p = pT;
+
+		if (this->p && !InterlockedDecrement(&this->m_nRef))
+		{
+			InterlockedIncrement(&this->m_nRef);
+
+			delete p; // v3->vfptr->__vecDelDtor(v3, 1u);
+		}
+
+		return this;
+	}
+
+	/// <summary>
+	/// Set this ZRef equal to the given ZRef
+	/// </summary>
+	ZRef<T>* operator=(ZRef<T>* r)
+	{
+		ZRefCounted* pBase;
+
+		if (r->p)
+		{
+			ZRefCounted* pBase = r->GetBase();
+			InterlockedIncrement(&pBase->m_nRef);
+		}
+
+		this->ReleaseRaw();
+
+		this->p = r->p;
+
+		return this;
+	}
+
+	/// <summary>
+	/// Release pointer resources.
+	/// </summary>
+	ZRef<T>* operator=(int zero)
+	{
+		this->ReleaseRaw();
+		return this;
+	}
+
+	/// <summary>
+	/// Fetch pointer to encapsulated object.
+	/// </summary>
+	operator T* ()
+	{
+		return this->p;
+	}
+
+	/// <summary>
+	/// Fetch pointer to encapsulated object.
+	/// </summary>
+	T* operator->()
+	{
+		return this->p;
+	}
+
+	/// <summary>
+	/// Determine if encapsulated pointer is null.
+	/// </summary>
+	BOOL operator!()
+	{
+		return this->p == nullptr;
+	}
+
 private:
+	/// <summary>
+	/// Decrement pointer reference count and release resources if references are zero.
+	/// </summary>
 	void ReleaseRaw()
 	{
 		if (!this->p) return;
@@ -93,12 +174,15 @@ private:
 		{
 			InterlockedIncrement(&pBase->m_nRef);
 
-			delete p; // if (v3) (**v3)(v3, 1);
+			delete pBase; // if (v3) (**v3)(v3, 1);
 		}
 
 		this->p = nullptr;
 	}
 
+	/// <summary>
+	/// Returns the associated ZRefCounted object pointer.
+	/// </summary>
 	ZRefCounted* GetBase()
 	{
 		ZRefCounted* pBase;
@@ -110,7 +194,7 @@ private:
 		}
 		else
 		{
-			pBase = reinterpret_cast<ZRefCounted*>(((char*)this) - (sizeof(ZRefCountedDummy<T>) - sizeof(T)));
+			pBase = reinterpret_cast<ZRefCounted*>(((char*)this->p) - (sizeof(ZRefCountedDummy<T>) - sizeof(T)));
 
 			static_assert(sizeof(ZRefCountedDummy<T>) - sizeof(T) == 16, "Size is not expected value");
 		}

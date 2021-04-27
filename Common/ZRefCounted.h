@@ -4,7 +4,6 @@
 class ZRefCounted
 {
 public:
-
 	ZRefCounted()
 	{
 		this->m_nRef = 0;

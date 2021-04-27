@@ -12,6 +12,11 @@ public:
 		ZRecyclableStatic::CallBack* m_pNext;
 
 	protected:
+		CallBack()
+		{
+			m_pNext = nullptr;
+		}
+
 		virtual ~CallBack() = default;
 	};
 

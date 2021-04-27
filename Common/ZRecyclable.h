@@ -10,7 +10,7 @@ template <class T> class ZRefCountedDummy;
 template <typename Type, size_t Size, typename Value>
 class ZRecyclable : protected ZAllocBase
 {
-public:
+protected:
 	virtual ~ZRecyclable() = default;
 
 	/* uses ZRecycleAvBuffer for memory management */

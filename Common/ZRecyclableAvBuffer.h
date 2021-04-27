@@ -14,6 +14,13 @@ private:
 	ZFatalSection m_l; // TODO maybe emulate this one day
 	void* m_pAv;
 
+	ZRecyclableAvBuffer()
+	{
+		this->m_pAv = nullptr;
+		this->m_pStat = nullptr;
+		ZeroMemory(&this->m_l, sizeof(ZFatalSection));
+	}
+
 	static std::mutex* GetMutex() // instead of ZFatalSection
 	{
 		static std::mutex mtx;

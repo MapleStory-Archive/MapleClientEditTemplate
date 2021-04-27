@@ -187,7 +187,9 @@ public:
 		{
 			HANDLE hHeap = GetProcessHeap(); // get handle to process heap
 
-			BOOL bRet = HeapFree(hHeap, NULL, p - 1); // release memory starting at memory size pointer
+			LPVOID pMem = p - 1;
+
+			BOOL bRet = HeapFree(hHeap, NULL, pMem); // release memory starting at memory size pointer
 #if _DEBUG
 			if (!bRet)
 			{
