@@ -170,7 +170,53 @@ struct SECPOINT
 	TSecType<long> y;
 	TSecType<long> x;
 
-	operator POINT()
+	SECPOINT()
+	{
+		x = TSecType<long>();
+		y = TSecType<long>();
+	}
+
+	~SECPOINT()
+	{
+		x.~TSecType();
+		y.~TSecType();
+	}
+
+	SECPOINT* operator =(tagPOINT* ptSrc)
+	{
+		this->x.SetData(ptSrc->x);
+		this->y.SetData(ptSrc->y);
+		return this;
+	}
+
+	SECPOINT* operator =(SECPOINT* ptSrc)
+	{
+		this->x.SetData(ptSrc->x.GetData());
+		this->y.SetData(ptSrc->y.GetData());
+		return this;
+	}
+
+	BOOL operator !=(tagPOINT* ptSrc)
+	{
+		return this->x.GetData() != ptSrc->x || this->y.GetData() != ptSrc->y;
+	}
+
+	BOOL operator ==(tagPOINT* ptSrc)
+	{
+		return this->x.GetData() == ptSrc->x && this->y.GetData() == ptSrc->y;
+	}
+
+	BOOL operator !=(SECPOINT* ptSrc)
+	{
+		return this->x.GetData() != ptSrc->x.GetData() || this->y.GetData() != ptSrc->y.GetData();
+	}
+
+	BOOL operator ==(SECPOINT* ptSrc)
+	{
+		return this->x.GetData() == ptSrc->x.GetData() && this->y.GetData() == ptSrc->y.GetData();
+	}
+
+	operator tagPOINT()
 	{
 		return { this->x.GetData(), this->y.GetData() };
 	}
