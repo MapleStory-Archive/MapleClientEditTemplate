@@ -15,8 +15,9 @@ class ZRef : protected ZRefCountedAccessor<T>, protected ZRefCountedAccessor<ZRe
 {
 private:
 	BYTE gap0[1];
-	T* p;
+
 public:
+	T* p; // TODO uhh maybe reconsider exposing this as public
 
 	ZRef()
 	{
@@ -26,6 +27,8 @@ public:
 
 	ZRef(ZRefCounted* pT, BOOL bAddRef = TRUE)
 	{
+		this->gap0[0] = NULL;
+
 		if (!pT)
 		{
 			this->p = nullptr;
@@ -44,6 +47,7 @@ public:
 	ZRef(ZRef<T>* r)
 	{
 		ZRefCounted* pBase;
+		this->gap0[0] = NULL;
 
 		this->p = r->p;
 
@@ -173,7 +177,7 @@ private:
 		{
 			InterlockedIncrement(&pBase->m_nRef);
 
-			delete pBase; // if (v3) (**v3)(v3, 1);
+ 			delete pBase; // if (v3) (**v3)(v3, 1);
 		}
 
 		this->p = nullptr;

@@ -7,18 +7,19 @@
 #include "ZRefCountedDummy.h"
 #include "ZRef.h"
 
+struct ZRefCountedTest : ZRefCounted
+{
+	const int test_member_value = 6;
+	int test_member;
+
+	ZRefCountedTest()
+	{
+		test_member = test_member_value;
+	}
+};
+
 int main()
 {
-	auto* p10 = new ZRef<long>();
-	p10->Alloc();
-
-	auto p20 = ZRef<long>(p10);
-	auto p30 = ZRef<long>(p10);
-	auto p40 = ZRef<long>(p10);
-	auto p50 = ZRef<long>(p10);
-	auto p60 = ZRef<long>(p10);
-
-	p10->~ZRef();
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
