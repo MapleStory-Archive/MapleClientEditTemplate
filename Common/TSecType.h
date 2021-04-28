@@ -1,42 +1,108 @@
 #pragma once
 #include <Windows.h>
 
-// thanks raj
+/*
+	Original Credits: https://github.com/67-6f-64/Firefly/blob/master/Firefly%20Spy/TSecType.hpp
+	Modifications Made By:
+		- Rajan Grewal
+		- Minimum Delta
+*/
 
 template <typename T>
 struct TSecData
 {
 	T data;
-	unsigned char bKey;
-	unsigned char FakePtr1;
-	unsigned char FakePtr2;
-	unsigned short wChecksum;
+	UCHAR bKey;
+	UCHAR FakePtr1;
+	UCHAR FakePtr2;
+	USHORT wChecksum;
 };
 
 template <typename T>
 class TSecType
 {
+private:
+	UINT FakePtr1;
+	UINT FakePtr2;
+	TSecData<T>* m_secdata;
+
 public:
 	TSecType()
 	{
-		this->m_secdata = reinterpret_cast<TSecData<T>*>(malloc(12));
+		this->m_secdata = new TSecData<T>(); // uses proper ZAllocEx now (since global new operator overload)
 
-		this->FakePtr1 = static_cast<unsigned int>(reinterpret_cast<unsigned int>(&this[-0x00003FF8]) + rand());
-		this->FakePtr2 = static_cast<unsigned int>(reinterpret_cast<unsigned int>(&this[-0x00003FF8]) + rand());
+		this->FakePtr1 = static_cast<UINT>(rand());
+		this->FakePtr2 = static_cast<UINT>(rand());
 
-		this->m_secdata->FakePtr1 = static_cast<unsigned char>(LOBYTE(this->FakePtr1));
-		this->m_secdata->FakePtr2 = static_cast<unsigned char>(LOBYTE(this->FakePtr2));
+		this->m_secdata->FakePtr1 = static_cast<UCHAR>(LOBYTE(this->FakePtr1));
+		this->m_secdata->FakePtr2 = static_cast<UCHAR>(LOBYTE(this->FakePtr2));
 
-		this->SetData(0);
+		this->SetData(NULL);
+	}
+
+	TSecType(const T op)
+	{
+		this->m_secdata = new TSecData<T>(); // uses proper ZAllocEx now (since global new operator overload)
+
+		this->FakePtr1 = static_cast<UINT>(rand());
+		this->FakePtr2 = static_cast<UINT>(rand());
+
+		this->m_secdata->FakePtr1 = static_cast<UCHAR>(LOBYTE(this->FakePtr1));
+		this->m_secdata->FakePtr2 = static_cast<UCHAR>(LOBYTE(this->FakePtr2));
+
+		this->SetData(op);
 	}
 
 	~TSecType()
 	{
 		if (this->m_secdata)
 		{
-			free(this->m_secdata);
-			this->m_secdata = nullptr;
+			delete this->m_secdata;
 		}
+	}
+
+	operator T()
+	{
+		return this->GetData();
+	}
+
+	BOOL operator ==(TSecType<T>* op)
+	{
+		return this->GetData() == op->GetData();
+	}
+
+	TSecType<T> operator =(const T op)
+	{
+		this->SetData(op);
+		return this;
+	}
+
+	TSecType<T> operator =(TSecType<T>* op)
+	{
+		T data = op->GetData();
+		this->SetData(data);
+		return this;
+	}
+
+	T operator /=(const T op)
+	{
+		T tmp = this->GetData() / op;
+		this->SetData(tmp);
+		return tmp;
+	}
+
+	T operator *=(const T op)
+	{
+		T tmp = this->GetData() * op;
+		this->SetData(tmp);
+		return tmp;
+	}
+
+	T operator +=(const T op)
+	{
+		T tmp = this->GetData() + op;
+		this->SetData(tmp);
+		return tmp;
 	}
 
 	T GetData()
@@ -97,11 +163,6 @@ public:
 			}
 		}
 	}
-
-private:
-	unsigned int FakePtr1;
-	unsigned int FakePtr2;
-	TSecData<T>* m_secdata;
 };
 
 struct SECPOINT
