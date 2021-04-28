@@ -172,6 +172,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="ZRefUnitTesting.cpp" />
+    <ClCompile Include="ZtlSecureUnitTesting.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />

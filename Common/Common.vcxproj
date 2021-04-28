@@ -187,6 +187,7 @@
     <ClInclude Include="ZRefCounted.h" />
     <ClInclude Include="ZRefCountedAccessor.h" />
     <ClInclude Include="ZRefCountedDummy.h" />
+    <ClInclude Include="ZtlSecure.h" />
     <ClInclude Include="ZXString.h" />
   </ItemGroup>
   <ItemGroup>

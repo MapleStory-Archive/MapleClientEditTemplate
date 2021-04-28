@@ -6,7 +6,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace CommonUnitTesting
 {
-	TEST_CLASS(TemplateUnitTesting)
+	TEST_CLASS(ZRefUnitTesting)
 	{
 	public:
 
