@@ -17,7 +17,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TemplateTesting", "Template
 		{3EB29228-1F83-4DD3-B3C5-0F284FD50F39} = {3EB29228-1F83-4DD3-B3C5-0F284FD50F39}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTesting", "TemplateUnitTesting\TemplateUnitTesting.vcxproj", "{AFB54969-A72A-41C5-B5F5-142A318614A7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTesting", "UnitTesting\UnitTesting.vcxproj", "{AFB54969-A72A-41C5-B5F5-142A318614A7}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3EB29228-1F83-4DD3-B3C5-0F284FD50F39} = {3EB29228-1F83-4DD3-B3C5-0F284FD50F39}
 	EndProjectSection

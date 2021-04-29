@@ -22,7 +22,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{AFB54969-A72A-41C5-B5F5-142A318614A7}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>TemplateUnitTesting</RootNamespace>
+    <RootNamespace>UnitTesting</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectSubType>NativeUnitTestProject</ProjectSubType>
     <ProjectName>UnitTesting</ProjectName>
