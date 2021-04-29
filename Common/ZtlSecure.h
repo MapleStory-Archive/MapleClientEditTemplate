@@ -13,89 +13,8 @@
 #define ZTLSECURE_CHECKSUM 0xBAADF00D
 #define ZTLSECURE_ROTATION 5
 
-// todo
-class SECRECT
-{
-private:
-	int _ZtlSecureTear_left[2];
-	unsigned int _ZtlSecureTear_left_CS;
-	int _ZtlSecureTear_top[2];
-	unsigned int _ZtlSecureTear_top_CS;
-	int _ZtlSecureTear_right[2];
-	unsigned int _ZtlSecureTear_right_CS;
-	int _ZtlSecureTear_bottom[2];
-	unsigned int _ZtlSecureTear_bottom_CS;
-
-public:
-	void SetRect(int l, int t, int r, int b)
-	{
-		this->_ZtlSecureTear_left_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_left, l);
-		this->_ZtlSecureTear_top_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_top, t);
-		this->_ZtlSecureTear_right_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_right, r);
-		this->_ZtlSecureTear_bottom_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_bottom, b);
-	}
-
-	void SetRectEmpty()
-	{
-		this->_ZtlSecureTear_left_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_left, NULL);
-		this->_ZtlSecureTear_top_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_top, NULL);
-		this->_ZtlSecureTear_right_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_right, NULL);
-		this->_ZtlSecureTear_bottom_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_bottom, NULL);
-	}
-
-	int GetRight() // original name: ZtlSecureGet_right
-	{
-		return ZtlSecureFuse<int>(this->_ZtlSecureTear_right, this->_ZtlSecureTear_right_CS);
-	}
-
-	int GetLeft() // original name: ZtlSecureGet_left
-	{
-		return ZtlSecureFuse<int>(this->_ZtlSecureTear_left, this->_ZtlSecureTear_left_CS);
-	}
-
-	int GetTop()
-	{
-		return ZtlSecureFuse<int>(this->_ZtlSecureTear_top, this->_ZtlSecureTear_top_CS);
-	}
-
-	int GetBottom()
-	{
-		return ZtlSecureFuse<int>(this->_ZtlSecureTear_bottom, this->_ZtlSecureTear_bottom_CS);
-	}
-
-	void PutRight(int r)
-	{
-		this->_ZtlSecureTear_right_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_right, r);
-	}
-
-	void PutLeft(int l)
-	{
-		this->_ZtlSecureTear_left_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_left, l);
-	}
-
-	void PutTop(int t)
-	{
-		this->_ZtlSecureTear_top_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_top, t);
-	}
-
-	void PutBottom(int b)
-	{
-		this->_ZtlSecureTear_bottom_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_bottom, b);
-	}
-
-	BOOL IsRectEmpty()
-	{
-		if (GetLeft() < GetRight() && GetTop() < GetBottom())
-		{
-			return FALSE;
-		}
-
-		return TRUE;
-	}
-};
-
 template <typename T> // uses fastcall because it passes args through registers instead of on stack -- faster execution
-T __fastcall ZtlSecureTear(T* at, T t)
+unsigned int __fastcall ZtlSecureTear(T* at, T t)
 {
 	/* storage type is 1 byte large if size < 4, otherwise its 4 bytes large */
 	typedef std::conditional<(sizeof(T) < 4), unsigned char, unsigned int>::type PType;
@@ -151,3 +70,93 @@ T __fastcall ZtlSecureFuse(T* at, unsigned int uCS)
 
 	return  *reinterpret_cast<T*>(&value[0]);
 }
+
+class SECRECT
+{
+private:
+	int _ZtlSecureTear_left[2];
+	unsigned int _ZtlSecureTear_left_CS;
+	int _ZtlSecureTear_top[2];
+	unsigned int _ZtlSecureTear_top_CS;
+	int _ZtlSecureTear_right[2];
+	unsigned int _ZtlSecureTear_right_CS;
+	int _ZtlSecureTear_bottom[2];
+	unsigned int _ZtlSecureTear_bottom_CS;
+
+public:
+	SECRECT()
+	{
+		SetRect(0, 0, 0, 0);
+	}
+
+	SECRECT(int l, int t, int r, int b)
+	{
+		SetRect(l, t, r, b);
+	}
+
+	void SetRect(int l, int t, int r, int b)
+	{
+		this->_ZtlSecureTear_left_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_left, l);
+		this->_ZtlSecureTear_top_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_top, t);
+		this->_ZtlSecureTear_right_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_right, r);
+		this->_ZtlSecureTear_bottom_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_bottom, b);
+	}
+
+	void SetRectEmpty()
+	{
+		this->_ZtlSecureTear_left_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_left, NULL);
+		this->_ZtlSecureTear_top_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_top, NULL);
+		this->_ZtlSecureTear_right_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_right, NULL);
+		this->_ZtlSecureTear_bottom_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_bottom, NULL);
+	}
+
+	BOOL IsRectEmpty()
+	{
+		if (GetLeft() < GetRight() && GetTop() < GetBottom())
+		{
+			return FALSE;
+		}
+
+		return TRUE;
+	}
+
+	int GetRight() // original name: ZtlSecureGet_right
+	{
+		return ZtlSecureFuse<int>(this->_ZtlSecureTear_right, this->_ZtlSecureTear_right_CS);
+	}
+
+	int GetLeft() // original name: ZtlSecureGet_left
+	{
+		return ZtlSecureFuse<int>(this->_ZtlSecureTear_left, this->_ZtlSecureTear_left_CS);
+	}
+
+	int GetTop()
+	{
+		return ZtlSecureFuse<int>(this->_ZtlSecureTear_top, this->_ZtlSecureTear_top_CS);
+	}
+
+	int GetBottom()
+	{
+		return ZtlSecureFuse<int>(this->_ZtlSecureTear_bottom, this->_ZtlSecureTear_bottom_CS);
+	}
+
+	void PutRight(int r)
+	{
+		this->_ZtlSecureTear_right_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_right, r);
+	}
+
+	void PutLeft(int l)
+	{
+		this->_ZtlSecureTear_left_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_left, l);
+	}
+
+	void PutTop(int t)
+	{
+		this->_ZtlSecureTear_top_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_top, t);
+	}
+
+	void PutBottom(int b)
+	{
+		this->_ZtlSecureTear_bottom_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_bottom, b);
+	}
+};
