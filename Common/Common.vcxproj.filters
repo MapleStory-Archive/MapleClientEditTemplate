@@ -108,6 +108,9 @@
     <ClInclude Include="ZRefCountedAccessor.h">
       <Filter>Header Files\MapleTypes\ZRef</Filter>
     </ClInclude>
+    <ClInclude Include="ZtlSecure.h">
+      <Filter>Header Files\MapleTypes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FakeModule.cpp">

@@ -17,6 +17,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TemplateTesting", "Template
 		{3EB29228-1F83-4DD3-B3C5-0F284FD50F39} = {3EB29228-1F83-4DD3-B3C5-0F284FD50F39}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTesting", "UnitTesting\UnitTesting.vcxproj", "{AFB54969-A72A-41C5-B5F5-142A318614A7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3EB29228-1F83-4DD3-B3C5-0F284FD50F39} = {3EB29228-1F83-4DD3-B3C5-0F284FD50F39}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -39,6 +44,10 @@ Global
 		{4C5F5040-839B-43E2-AABD-0DFD96069A0B}.Debug|x86.Build.0 = Debug|Win32
 		{4C5F5040-839B-43E2-AABD-0DFD96069A0B}.Release|x86.ActiveCfg = Release|Win32
 		{4C5F5040-839B-43E2-AABD-0DFD96069A0B}.Release|x86.Build.0 = Release|Win32
+		{AFB54969-A72A-41C5-B5F5-142A318614A7}.Debug|x86.ActiveCfg = Debug|Win32
+		{AFB54969-A72A-41C5-B5F5-142A318614A7}.Debug|x86.Build.0 = Debug|Win32
+		{AFB54969-A72A-41C5-B5F5-142A318614A7}.Release|x86.ActiveCfg = Release|Win32
+		{AFB54969-A72A-41C5-B5F5-142A318614A7}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

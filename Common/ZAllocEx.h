@@ -419,7 +419,6 @@ public:
 
 void* operator new(size_t uSize)
 {
-	Log("returning size of %d", uSize);
 	return ZAllocEx<ZAllocAnonSelector>::GetInstance()->Alloc(uSize);
 }
 

@@ -7,7 +7,8 @@ public:
 	ZRefCounted()
 	{
 		this->m_nRef = 0;
-		this->m_pPrev = 0;
+		this->m_pPrev = nullptr;
+		this->m_pNext = nullptr;
 	}
 
 	virtual ~ZRefCounted() = default;

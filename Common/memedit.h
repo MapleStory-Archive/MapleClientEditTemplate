@@ -20,14 +20,14 @@ extern VOID PatchCall(DWORD dwAddress, PVOID pDestination);
 extern VOID PatchNop(DWORD dwAddress, UINT nCount);
 extern VOID WriteBytes(DWORD dwAddress, const char* pData, UINT nCount);
 
-template <typename T>
-VOID WriteValue(DWORD dwAddress, T pValue)
+template <typename TType>
+VOID WriteValue(DWORD dwAddress, TType pValue)
 {
-	*((T*)dwAddress) = pValue;
+	*((TType*)dwAddress) = pValue;
 }
 
-template <typename T>
-T ReadValue(DWORD dwAddr)
+template <typename TType>
+TType ReadValue(DWORD dwAddr)
 {
-	return *((T*)dwAddr);
+	return *((TType*)dwAddr);
 }
