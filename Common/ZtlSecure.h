@@ -27,29 +27,70 @@ private:
 	unsigned int _ZtlSecureTear_bottom_CS;
 
 public:
+	void SetRect(int l, int t, int r, int b)
+	{
+		this->_ZtlSecureTear_left_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_left, l);
+		this->_ZtlSecureTear_top_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_top, t);
+		this->_ZtlSecureTear_right_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_right, r);
+		this->_ZtlSecureTear_bottom_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_bottom, b);
+	}
+
 	void SetRectEmpty()
 	{
-
+		this->_ZtlSecureTear_left_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_left, NULL);
+		this->_ZtlSecureTear_top_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_top, NULL);
+		this->_ZtlSecureTear_right_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_right, NULL);
+		this->_ZtlSecureTear_bottom_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_bottom, NULL);
 	}
 
 	int GetRight() // original name: ZtlSecureGet_right
 	{
-
+		return ZtlSecureFuse<int>(this->_ZtlSecureTear_right, this->_ZtlSecureTear_right_CS);
 	}
 
 	int GetLeft() // original name: ZtlSecureGet_left
 	{
-
+		return ZtlSecureFuse<int>(this->_ZtlSecureTear_left, this->_ZtlSecureTear_left_CS);
 	}
 
-	void PutRight()
+	int GetTop()
 	{
-
+		return ZtlSecureFuse<int>(this->_ZtlSecureTear_top, this->_ZtlSecureTear_top_CS);
 	}
 
-	void PutLeft()
+	int GetBottom()
 	{
+		return ZtlSecureFuse<int>(this->_ZtlSecureTear_bottom, this->_ZtlSecureTear_bottom_CS);
+	}
 
+	void PutRight(int r)
+	{
+		this->_ZtlSecureTear_right_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_right, r);
+	}
+
+	void PutLeft(int l)
+	{
+		this->_ZtlSecureTear_left_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_left, l);
+	}
+
+	void PutTop(int t)
+	{
+		this->_ZtlSecureTear_top_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_top, t);
+	}
+
+	void PutBottom(int b)
+	{
+		this->_ZtlSecureTear_bottom_CS = ZtlSecureTear<int>(this->_ZtlSecureTear_bottom, b);
+	}
+
+	BOOL IsRectEmpty()
+	{
+		if (GetLeft() < GetRight() && GetTop() < GetBottom())
+		{
+			return FALSE;
+		}
+
+		return TRUE;
 	}
 };
 
