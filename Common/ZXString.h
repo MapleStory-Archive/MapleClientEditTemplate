@@ -8,7 +8,7 @@ template<typename T> struct ZAllocStrSelector;
 /*
 	Credits: Minimum Delta - this was a pain in the ass to figure out, ya'll
 
-	Stole a lot of documenation and ideas from: 
+	Stole a lot of documenation and ideas from:
 	 * https://docs.microsoft.com/en-us/cpp/cpp/bstr-t-class
 	 * https://docs.microsoft.com/en-us/cpp/cpp/smart-pointers-modern-cpp
 	 * https://en.cppreference.com/w/cpp/language/operators
@@ -41,7 +41,7 @@ public:
 		/// </summary>
 		/// <remarks>Has to be volatile because of interlocked operations</remarks>
 		volatile long nRef;
-				
+
 		/// <summary>
 		/// The string buffer size limit (not including the string data struct)
 		/// </summary>
@@ -152,6 +152,11 @@ public:
 		return this->Compare(s);
 	}
 
+	BOOL operator!=(ZXString<T>* s)
+	{
+		return !this->Compare(s);
+	}
+
 	/// <summary>
 	/// Compares a ZXString object to a char array of equal size as the T type in the ZXString object.
 	/// </summary>
@@ -162,6 +167,13 @@ public:
 	BOOL operator==(const T* s)
 	{
 		return this->Compare(s);
+	}
+
+	BOOL operator!=(const T* s)
+	{
+		{
+			return !this->Compare(s);
+		}
 	}
 
 	/// <summary>
