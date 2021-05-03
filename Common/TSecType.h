@@ -6,24 +6,27 @@
 	Modifications Made By:
 		- Rajan Grewal
 		- Minimum Delta
+
+	Additional Information From: https://en.cppreference.com/w/cpp/language/operators
 */
 
 template <typename T>
-struct TSecData
+class TSecData
 {
+public:
 	T data;
-	UCHAR bKey;
-	UCHAR FakePtr1;
-	UCHAR FakePtr2;
-	USHORT wChecksum;
+	BYTE bKey;
+	BYTE FakePtr1;
+	BYTE FakePtr2;
+	WORD wChecksum;
 };
 
 template <typename T>
 class TSecType
 {
 private:
-	UINT FakePtr1;
-	UINT FakePtr2;
+	DWORD FakePtr1;
+	DWORD FakePtr2;
 	TSecData<T>* m_secdata;
 
 public:
@@ -31,11 +34,11 @@ public:
 	{
 		this->m_secdata = new TSecData<T>(); // uses proper ZAllocEx now (since global new operator overload)
 
-		this->FakePtr1 = static_cast<UINT>(rand());
-		this->FakePtr2 = static_cast<UINT>(rand());
+		this->FakePtr1 = static_cast<DWORD>(rand());
+		this->FakePtr2 = static_cast<DWORD>(rand());
 
-		this->m_secdata->FakePtr1 = static_cast<UCHAR>(LOBYTE(this->FakePtr1));
-		this->m_secdata->FakePtr2 = static_cast<UCHAR>(LOBYTE(this->FakePtr2));
+		this->m_secdata->FakePtr1 = LOBYTE(this->FakePtr1);
+		this->m_secdata->FakePtr2 = LOBYTE(this->FakePtr2);
 
 		this->SetData(NULL);
 	}
@@ -44,11 +47,11 @@ public:
 	{
 		this->m_secdata = new TSecData<T>(); // uses proper ZAllocEx now (since global new operator overload)
 
-		this->FakePtr1 = static_cast<UINT>(rand());
-		this->FakePtr2 = static_cast<UINT>(rand());
+		this->FakePtr1 = static_cast<DWORD>(rand()); 
+		this->FakePtr2 = static_cast<DWORD>(rand()); 
 
-		this->m_secdata->FakePtr1 = static_cast<UCHAR>(LOBYTE(this->FakePtr1));
-		this->m_secdata->FakePtr2 = static_cast<UCHAR>(LOBYTE(this->FakePtr2));
+		this->m_secdata->FakePtr1 = LOBYTE(this->FakePtr1);
+		this->m_secdata->FakePtr2 = LOBYTE(this->FakePtr2);
 
 		this->SetData(op);
 	}
@@ -71,13 +74,13 @@ public:
 		return this->GetData() == op->GetData();
 	}
 
-	TSecType<T> operator =(const T op)
+	TSecType<T>* operator =(const T op)
 	{
 		this->SetData(op);
 		return this;
 	}
 
-	TSecType<T> operator =(TSecType<T>* op)
+	TSecType<T>* operator =(TSecType<T>* op)
 	{
 		T data = op->GetData();
 		this->SetData(data);
@@ -105,18 +108,24 @@ public:
 		return tmp;
 	}
 
+	T operator -=(const T op)
+	{
+		T tmp = this->GetData() - op;
+		this->SetData(tmp);
+		return tmp;
+	}
+
 	T GetData()
 	{
-		T decrypted_data = 0;
-		unsigned short checksum = 0;
+		T decrypted_data = this->m_secdata->data;
+		WORD wChecksum = 0;
 
-		for (unsigned char i = 0, key = 0; i < (sizeof(T) + 1); i++)
+		for (BYTE i = 0, key = this->m_secdata->bKey; i < (sizeof(T) + 1); i++)
 		{
-			key = (i == 0 ? this->m_secdata->bKey : reinterpret_cast<unsigned char*>(&this->m_secdata->data)[i - 1] + key + 42);
-
 			if (i > 0)
 			{
-				checksum = (i > 1 ? ((8 * checksum) | (key + (checksum >> 13))) : ((key + 4) | 0xD328));
+				key = reinterpret_cast<BYTE*>(&this->m_secdata->data)[i - 1] + key + 42;;
+				wChecksum = i > 1 ? ((8 * wChecksum) | (key + (wChecksum >> 13))) : ((key + 4) | 0xD328);
 			}
 
 			if (i < sizeof(T))
@@ -126,30 +135,30 @@ public:
 					key = 42;
 				}
 
-				reinterpret_cast<unsigned char*>(&decrypted_data)[i] = reinterpret_cast<unsigned char*>(&this->m_secdata->data)[i] ^ key;
+				reinterpret_cast<BYTE*>(&decrypted_data)[i] = reinterpret_cast<BYTE*>(&this->m_secdata->data)[i] ^ key;
 			}
+
 		}
 
-		if (this->m_secdata->wChecksum != checksum || LOBYTE(this->FakePtr1) != this->m_secdata->FakePtr1 || LOBYTE(this->FakePtr2) != this->m_secdata->FakePtr2)
+		if (this->m_secdata->wChecksum != wChecksum || LOBYTE(this->FakePtr1) != this->m_secdata->FakePtr1 || LOBYTE(this->FakePtr2) != this->m_secdata->FakePtr2)
 		{
-			return 0; //TODO: CxxThrow
+			return NULL; //TODO: CxxThrow
 		}
 
 		return decrypted_data;
 	}
 
-	void SetData(T data)
+	VOID SetData(T data)
 	{
-		this->m_secdata->bKey = static_cast<unsigned char>(rand());
-		this->m_secdata->wChecksum = static_cast<unsigned short>(39525);
+		this->m_secdata->bKey = LOBYTE(rand());
+		this->m_secdata->wChecksum = sizeof(T) > 1 ? static_cast<WORD>(39525) : static_cast<WORD>(-26011);
 
-		for (unsigned char i = 0, key = 0; i < (sizeof(T) + 1); i++)
+		for (BYTE i = 0, key = this->m_secdata->bKey; i < (sizeof(T) + 1); i++)
 		{
-			key = (i == 0 ? this->m_secdata->bKey : (key ^ reinterpret_cast<unsigned char*>(&data)[i - 1]) + key + 42);
-
 			if (i > 0)
 			{
-				this->m_secdata->wChecksum = ((8 * this->m_secdata->wChecksum) | (key + (this->m_secdata->wChecksum >> 13)));
+				key = (key ^ reinterpret_cast<BYTE*>(&data)[i - 1]) + key + 42;
+				this->m_secdata->wChecksum = (8 * this->m_secdata->wChecksum) | (key + (this->m_secdata->wChecksum >> 13));
 			}
 
 			if (i < sizeof(T))
@@ -159,27 +168,43 @@ public:
 					key = 42;
 				}
 
-				reinterpret_cast<unsigned char*>(&this->m_secdata->data)[i] = reinterpret_cast<unsigned char*>(&data)[i] ^ key;
+				reinterpret_cast<BYTE*>(&this->m_secdata->data)[i] = reinterpret_cast<BYTE*>(&data)[i] ^ key;
 			}
+
 		}
 	}
 };
 
-struct SECPOINT
+class SECPOINT
 {
+public:
 	TSecType<long> y;
 	TSecType<long> x;
 
-	SECPOINT()
+	SECPOINT() { }
+
+	SECPOINT(long ptX, long ptY)
 	{
-		x = TSecType<long>();
-		y = TSecType<long>();
+		this->x = ptX;
+		this->y = ptY;
+	}
+
+	SECPOINT(SECPOINT* ptSrc)
+	{
+		this->x.SetData(ptSrc->x.GetData());
+		this->y.SetData(ptSrc->y.GetData());
+	}
+
+	SECPOINT(tagPOINT* ptSrc)
+	{
+		this->x.SetData(ptSrc->x);
+		this->y.SetData(ptSrc->y);
 	}
 
 	~SECPOINT()
 	{
-		x.~TSecType();
-		y.~TSecType();
+		this->x.~TSecType();
+		this->y.~TSecType();
 	}
 
 	SECPOINT* operator =(tagPOINT* ptSrc)
@@ -221,3 +246,6 @@ struct SECPOINT
 		return { this->x.GetData(), this->y.GetData() };
 	}
 };
+
+//assert_size(sizeof(TSecData<long>), 0x0C)
+//assert_size(sizeof(TSecType<long>), 0x0C)

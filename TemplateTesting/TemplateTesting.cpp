@@ -7,38 +7,23 @@
 #include "ZRefCountedDummy.h"
 #include "ZRef.h"
 #include "ZtlSecure.h"
+#include <TSecType.h>
 
 int main()
 {
-	char ac[2];
-	unsigned char auc[2];
-	
-	short as[2];
-	unsigned short aus[2];
+	TSecType<long> ts1 = 0;
+	ts1 = (long)0;
 
-	int ai[2]; // no need to do long cuz its the same size
-	unsigned int aui[2];
+	int z = ts1.GetData();
 
-	long long all[2];
-	unsigned long long aull[2];
+	ts1 = 20;
 
-	float af[2];
-	double ad[2];
+	z = ts1.GetData();
 
-	char cr = ZtlSecureFuse<char>(ac, ZtlSecureTear<char>(ac, -45));
-	unsigned char ucr = ZtlSecureFuse<unsigned char>(auc, ZtlSecureTear<unsigned char>(auc, -45));
+	SECPOINT sp2 = SECPOINT(15, 20);
 
-	short sr = ZtlSecureFuse<short>(as, ZtlSecureTear<short>(as, -45));
-	unsigned short usr = ZtlSecureFuse<unsigned short>(aus, ZtlSecureTear<unsigned short>(aus, -45));
-
-	int ir = ZtlSecureFuse<int>(ai, ZtlSecureTear<int>(ai, -45));
-	unsigned int uir = ZtlSecureFuse<unsigned int>(aui, ZtlSecureTear<unsigned int>(aui, -45));
-
-	long long llr = ZtlSecureFuse<long long>(all, ZtlSecureTear<long long>(all, -45));
-	unsigned long long ullr = ZtlSecureFuse<unsigned long long>(aull, ZtlSecureTear<unsigned long long>(aull, -45));
-
-	float fr = ZtlSecureFuse<float>(af, ZtlSecureTear<float>(af, -45));
-	double dr = ZtlSecureFuse<double>(ad, ZtlSecureTear<double>(ad, -45));
+	int x = sp2.x.GetData();
+	int y = sp2.y.GetData();
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
