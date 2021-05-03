@@ -6,6 +6,8 @@
 	Modifications Made By:
 		- Rajan Grewal
 		- Minimum Delta
+
+	Additional Information From: https://en.cppreference.com/w/cpp/language/operators
 */
 
 template <typename T>
@@ -102,6 +104,13 @@ public:
 	T operator +=(const T op)
 	{
 		T tmp = this->GetData() + op;
+		this->SetData(tmp);
+		return tmp;
+	}
+
+	T operator -=(const T op)
+	{
+		T tmp = this->GetData() - op;
 		this->SetData(tmp);
 		return tmp;
 	}

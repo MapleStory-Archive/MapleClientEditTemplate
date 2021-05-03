@@ -11,7 +11,62 @@ namespace CommonUnitTesting
 	public:
 		TEST_METHOD(ConstructorTesting)
 		{
+			TSecType<char> ts_c = TSecType<char>();
+			TSecType<short> ts_s = TSecType<short>();
+			TSecType<long> ts_l = TSecType<long>();
+			TSecType<double> ts_d = TSecType<double>();
 
+			Assert::IsTrue(ts_c.GetData() == 0, TEXT("Char constructor failed to initialize data to zero."));
+			Assert::IsTrue(ts_s.GetData() == 0, TEXT("Short constructor failed to initialize data to zero."));
+			Assert::IsTrue(ts_l.GetData() == 0, TEXT("Long constructor failed to initialize data to zero."));
+			Assert::IsTrue(ts_d.GetData() == 0.0, TEXT("Double constructor failed to initialize data to zero."));
+
+			ts_c = 1;
+			ts_s = 1;
+			ts_l = 1;
+			ts_d = 1.0;
+
+			Assert::IsTrue(ts_c.GetData() == 1, TEXT("Char SetData() failed to set data to 1."));
+			Assert::IsTrue(ts_s.GetData() == 1, TEXT("Short SetData() failed to set data to 1."));
+			Assert::IsTrue(ts_l.GetData() == 1, TEXT("Long SetData() failed to set data to 1."));
+			Assert::IsTrue(ts_d.GetData() == 1.0, TEXT("Double SetData() failed to set data to 1."));
+		}
+
+		TEST_METHOD(OperatorOverloadTesting)
+		{
+			TSecType<long> ts_l = TSecType<long>();
+			ts_l = 1;
+
+			TSecType<long> ts_l1 = ts_l;
+
+			Assert::IsTrue(ts_l1.GetData() == ts_l.GetData(), TEXT("Operator = overload failed."));
+
+			Assert::IsTrue(ts_l == ts_l1, TEXT("Operator == overload failed."));
+			Assert::IsFalse(ts_l != ts_l1, TEXT("Operator != overload failed."));
+
+			ts_l *= 2;
+
+			Assert::IsTrue(ts_l == 2, TEXT("Operator *= overload failed."));
+
+			ts_l += ts_l;
+
+			Assert::IsTrue(ts_l == 4, TEXT("Operator += overload failed."));
+
+			ts_l += 4;
+
+			Assert::IsTrue(ts_l == 8, TEXT("Operator += overload failed."));
+
+			int x = ts_l + 4 + ts_l;
+
+			Assert::IsTrue(x == 20, TEXT("Operator + overload failed."));
+
+			int y = ts_l - 4 - ts_l;
+
+			Assert::IsTrue(y == -4, TEXT("Operator - overload failed."));
+
+			ts_l -= 4;
+
+			Assert::IsTrue(ts_l == 4, TEXT("Operator -= overload failed."));
 		}
 	};
 
