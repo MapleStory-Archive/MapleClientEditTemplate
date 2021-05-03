@@ -7,10 +7,14 @@
 #include "ZRefCountedDummy.h"
 #include "ZRef.h"
 #include "ZtlSecure.h"
+#include <TSecType.h>
 
 int main()
 {
+	SECPOINT sp2 = SECPOINT(15, 20);
 
+	int x = sp2.x.GetData();
+	int y = sp2.y.GetData();
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
