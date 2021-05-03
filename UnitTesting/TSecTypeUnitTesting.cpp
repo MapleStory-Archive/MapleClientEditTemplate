@@ -9,7 +9,6 @@ namespace CommonUnitTesting
 	TEST_CLASS(TSecTypeUnitTesting)
 	{
 	public:
-
 		TEST_METHOD(ConstructorTesting)
 		{
 
@@ -19,7 +18,6 @@ namespace CommonUnitTesting
 	TEST_CLASS(SECPOINTUnitTesting)
 	{
 	public:
-
 		TEST_METHOD(ConstructorTesting)
 		{
 			SECPOINT sp = SECPOINT();
@@ -52,14 +50,9 @@ namespace CommonUnitTesting
 
 			Assert::IsTrue(tp.x == sp5.x.GetData(), TEXT("SECPOINT = tagPOINT operator overload failed (X value incorrect)"));
 			Assert::IsTrue(tp.y == sp5.y.GetData(), TEXT("SECPOINT = tagPOINT operator overload failed (Y value incorrect)"));
-		}
 
-		TEST_METHOD(EqualsOperatorTesting)
-		{
-			SECPOINT sp = SECPOINT(15, 20);
-
-			Assert::IsTrue(sp.x.GetData() == 15, TEXT("X does not equal 15"));
-			Assert::IsTrue(sp.y.GetData() == 20, TEXT("Y does not equal 20"));
+			Assert::IsTrue(sp5 == &sp4, TEXT("Operator == overload failed."));
+			Assert::IsFalse(sp5 != &sp4, TEXT("Operator != overload failed."));
 		}
 
 		TEST_METHOD(TagPointTesting)
@@ -76,7 +69,15 @@ namespace CommonUnitTesting
 			Assert::IsTrue(sp.x == tp.x, TEXT("TagPoint and SecPoint X-Value missmatch"));
 			Assert::IsTrue(sp.y == tp.y, TEXT("TagPoint and SecPoint Y-Value missmatch"));
 
+			SECPOINT sp1 = SECPOINT(15, 20);
+			tagPOINT tp1 = tagPOINT(sp);
 
+			Assert::IsTrue(sp == &tp, TEXT("SECPOINT does not equal tagPOINT"));
+			Assert::IsFalse(sp != &tp, TEXT("SECPOINT equals tagPOINT"));
+
+			tagPOINT tp2 = sp;
+
+			Assert::IsTrue(sp == &tp2, TEXT("tagPOINT operator overload failed."));
 		}
 	};
 }

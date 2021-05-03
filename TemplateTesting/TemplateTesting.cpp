@@ -11,6 +11,15 @@
 
 int main()
 {
+	TSecType<long> ts1 = 0;
+	ts1 = (long)0;
+
+	int z = ts1.GetData();
+
+	ts1 = 20;
+
+	z = ts1.GetData();
+
 	SECPOINT sp2 = SECPOINT(15, 20);
 
 	int x = sp2.x.GetData();

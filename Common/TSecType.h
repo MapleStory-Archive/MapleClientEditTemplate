@@ -72,13 +72,13 @@ public:
 		return this->GetData() == op->GetData();
 	}
 
-	TSecType<T> operator =(const T op)
+	TSecType<T>* operator =(const T op)
 	{
 		this->SetData(op);
 		return this;
 	}
 
-	TSecType<T> operator =(TSecType<T>* op)
+	TSecType<T>* operator =(TSecType<T>* op)
 	{
 		T data = op->GetData();
 		this->SetData(data);
@@ -111,14 +111,11 @@ public:
 		T decrypted_data = this->m_secdata->data;
 		WORD wChecksum = 0;
 
-		for (BYTE i = 0, key = 0; i < (sizeof(T) + 1); i++)
+		for (BYTE i = 0, key = this->m_secdata->bKey; i < (sizeof(T) + 1); i++)
 		{
-			key = i == 0 
-				? this->m_secdata->bKey 
-				: reinterpret_cast<BYTE*>(&this->m_secdata->data)[i - 1] + key + 42;
-
 			if (i > 0)
 			{
+				key = reinterpret_cast<BYTE*>(&this->m_secdata->data)[i - 1] + key + 42;;
 				wChecksum = i > 1 ? ((8 * wChecksum) | (key + (wChecksum >> 13))) : ((key + 4) | 0xD328);
 			}
 
@@ -131,6 +128,7 @@ public:
 
 				reinterpret_cast<BYTE*>(&decrypted_data)[i] = reinterpret_cast<BYTE*>(&this->m_secdata->data)[i] ^ key;
 			}
+
 		}
 
 		if (this->m_secdata->wChecksum != wChecksum || LOBYTE(this->FakePtr1) != this->m_secdata->FakePtr1 || LOBYTE(this->FakePtr2) != this->m_secdata->FakePtr2)
@@ -146,14 +144,11 @@ public:
 		this->m_secdata->bKey = LOBYTE(rand());
 		this->m_secdata->wChecksum = sizeof(T) > 1 ? static_cast<WORD>(39525) : static_cast<WORD>(-26011);
 
-		for (BYTE i = 0, key = 0; i < (sizeof(T) + 1); i++)
+		for (BYTE i = 0, key = this->m_secdata->bKey; i < (sizeof(T) + 1); i++)
 		{
-			key = i == 0 
-				? this->m_secdata->bKey 
-				: (key ^ reinterpret_cast<BYTE*>(&data)[i - 1]) + key + 42;
-
 			if (i > 0)
 			{
+				key = (key ^ reinterpret_cast<BYTE*>(&data)[i - 1]) + key + 42;
 				this->m_secdata->wChecksum = (8 * this->m_secdata->wChecksum) | (key + (this->m_secdata->wChecksum >> 13));
 			}
 
@@ -166,6 +161,7 @@ public:
 
 				reinterpret_cast<BYTE*>(&this->m_secdata->data)[i] = reinterpret_cast<BYTE*>(&data)[i] ^ key;
 			}
+
 		}
 	}
 };
@@ -176,16 +172,12 @@ public:
 	TSecType<long> y;
 	TSecType<long> x;
 
-	SECPOINT()
-	{
-		this->x = TSecType<long>();
-		this->y = TSecType<long>();
-	}
+	SECPOINT() { }
 
-	SECPOINT(long x, long y)
+	SECPOINT(long ptX, long ptY)
 	{
-		this->x = TSecType<long>(x);
-		this->y = TSecType<long>(y);
+		this->x = ptX;
+		this->y = ptY;
 	}
 
 	SECPOINT(SECPOINT* ptSrc)
@@ -246,5 +238,5 @@ public:
 	}
 };
 
-assert_size(sizeof(TSecData<long>), 0x0C);
-assert_size(sizeof(TSecType<long>), 0x0C);
+//assert_size(sizeof(TSecData<long>), 0x0C)
+//assert_size(sizeof(TSecType<long>), 0x0C)
