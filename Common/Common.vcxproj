@@ -198,6 +198,7 @@
     <ClCompile Include="memedit.cpp" />
     <ClCompile Include="winhooks.cpp" />
     <ClCompile Include="winhook_types.cpp" />
+    <ClCompile Include="ZAllocEx.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
