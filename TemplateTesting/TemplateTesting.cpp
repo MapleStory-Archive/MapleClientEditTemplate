@@ -8,22 +8,22 @@
 #include "ZRef.h"
 #include "ZtlSecure.h"
 #include <TSecType.h>
+#include "ZArray.h"
 
 int main()
 {
-	TSecType<long> ts1 = 0;
-	ts1 = (long)0;
+	ZArray<int> arr = ZArray<int>(10);
 
-	int z = ts1.GetData();
+	for (int i = 0; i < 10; i++)
+	{
+		arr[i] = i * 10;
+	}
 
-	ts1 = 20;
+	auto head = arr.GetHeadPosition();
 
-	z = ts1.GetData();
+	int idx = arr.IndexOf(head);
 
-	SECPOINT sp2 = SECPOINT(15, 20);
-
-	int x = sp2.x.GetData();
-	int y = sp2.y.GetData();
+	arr.RemoveAt(head);
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

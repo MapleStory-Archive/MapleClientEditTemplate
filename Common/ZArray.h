@@ -3,7 +3,7 @@
 #include "ZAllocEx.h"
 
 template <typename T>
-struct ZArray
+class ZArray
 {
 private:
 	T* a;
@@ -37,9 +37,9 @@ public:
 		// TODO
 	}
 
-	T* operator[](int i)
+	T& operator[](int i)
 	{
-		return &this->a[i];
+		return this->a[i];
 	}
 
 	BOOL IsEmpty()
@@ -57,16 +57,35 @@ public:
 		return nullptr; // TODO
 	}
 
-	void RemoveAt(T* pos)
+	void RemoveAt(T* pos) // TODO test this
 	{
-		// TODO
+		pos->~T(); // or just delete pos?
+
+		memmove(pos, &pos[1], sizeof(T) * (this->GetCount() * this->IndexOf(pos) / sizeof(T)));
 	}
 
+	/// <summary>
+	/// Gets size of array.
+	/// </summary>
 	size_t GetCount()
 	{
 		return this->a ? reinterpret_cast<DWORD*>(this->a)[-1] : 0;
 	}
 
+	/// <summary>
+	/// Gets the index of the pointer passed into the function.
+	/// Passing a pointer that does not exist in the array will result in undefined behavior.
+	/// </summary>
+	UINT IndexOf(T* pos)
+	{
+		return pos - this->a; // compiler automatically divides by size or something here
+	}
+
+	/// <summary>
+	/// Gets the next pointer in the array sequence, or nullptr if there is no next item.
+	/// The return value is the original pointer passed into the pos parameter, and the pos
+	/// parameter will contain the pointer to the next value.
+	/// </summary>
 	T* GetNext(T** pos)
 	{
 		T* result = *pos;
@@ -76,6 +95,11 @@ public:
 		return result;
 	}
 
+	/// <summary>
+	/// Gets the previous pointer in the array sequence, or nullptr if there is no previous item.
+	/// The return value is the original pointer passed into the pos parameter, and the pos
+	/// parameter will contain the pointer to the previous value.
+	/// </summary>
 	T* GetPrev(T** pos)
 	{
 		T* result = *pos;
@@ -96,11 +120,19 @@ public:
 		return result;
 	}
 
+	/// <summary>
+	/// Fetches a pointer to the value on the top of the array stack.
+	/// </summary>
 	T* GetHeadPosition()
 	{
-		return nullptr; // TODO
+		size_t nCount = this->GetCount();
+
+		return nCount > 0 ? &this->a[nCount - 1] : nullptr;
 	}
 
+	/// <summary>
+	/// Removes all items from the array and calls their destructors.
+	/// </summary>
 	void RemoveAll()
 	{
 		if (this->a)
@@ -111,7 +143,7 @@ public:
 			this->Destroy(this->a, &this->a[*pAllocationBasePointer]);
 
 			/* Free array allocation */
-			ZAllocEx<ZAllocAnonSelector>::Free((void**)pAllocationBasePointer);
+			ZAllocEx<ZAllocAnonSelector>::GetInstance()->Free((void**)pAllocationBasePointer);
 			this->a = nullptr;
 		}
 	}
@@ -119,7 +151,7 @@ public:
 private:
 	static void Construct(T* start, T* end)
 	{
-		for (T i = start; i < end; i++)
+		for (T* i = start; i < end; i++)
 		{
 			i = T();
 		}
@@ -127,9 +159,9 @@ private:
 
 	static void Destroy(T* start, T* end)
 	{
-		for (T i = start; i < end; i++)
+		for (T* i = start; i < end; i++)
 		{
-			~T();
+			i->~T(); // or is it just delete i?
 		}
 	}
 
@@ -140,14 +172,15 @@ private:
 		if (!uSize) return;
 
 		/* Allocate Desired Array Size + 4 bytes */
-		PVOID pAlloc = ZAllocEx<ZAllocAnonSelector>::Alloc(sizeof(T) * uSize + sizeof(PVOID));
+		/* We casting to a dword so we can write and adjust the pointer easier */
+		DWORD* pAlloc = (DWORD*)ZAllocEx<ZAllocAnonSelector>::GetInstance()->Alloc(sizeof(T) * uSize + sizeof(PVOID));
 
 		/* Assign number of array items to array head */
-		*(DWORD*)pAlloc = uSize;
+		*pAlloc = uSize;
 
 		/* Assign start of real allocated block to array pointer */
 		/* We take index 1 because index zero is the array item count */
-		this->a = reinterpret_cast<T*>(pAlloc[1]);
+		this->a = reinterpret_cast<T*>(pAlloc + 1);
 	}
 
 	void Realloc(size_t uNewArraySize, int nMode) // Has an extra parameter (ZAllocHelper*) that I think is used for memory profiling the debug build
@@ -182,7 +215,7 @@ private:
 			if (uNewArraySize > uMaxCountInAllocBlock)
 			{
 				/* Allocated new block */
-				PVOID pNewAllocationBase = ZAllocEx<ZAllocAnonSelector>::Alloc(sizeof(T) * uNewArraySize + sizeof(PVOID));
+				PVOID pNewAllocationBase = ZAllocEx<ZAllocAnonSelector>::GetInstance()->Alloc(sizeof(T) * uNewArraySize + sizeof(PVOID));
 
 				/* Increment allocation base to save a spot for the array size encoding */
 				pNewAllocationBase += 1;
@@ -203,7 +236,7 @@ private:
 
 					/* Free old memory allocation */
 					void** pCurrentAllocationBase = reinterpret_cast<void**>(this->a) - 1;
-					ZAllocEx<ZAllocAnonSelector>::Free(pCurrentAllocationBase);
+					ZAllocEx<ZAllocAnonSelector>::GetInstance()->Free(pCurrentAllocationBase);
 				}
 				this->a = pNewAllocationBase;
 			}
@@ -255,7 +288,7 @@ private:
 		uCurArraySize = this->GetCount();
 
 		/* Allocate new block */
-		PVOID pNewAllocationBase = ZAllocEx<ZAllocAnonSelector>::Alloc(sizeof(T) * uItems + sizeof(PVOID));
+		PVOID pNewAllocationBase = ZAllocEx<ZAllocAnonSelector>::GetInstance()->Alloc(sizeof(T) * uItems + sizeof(PVOID));
 
 		/* Increment allocation base to save a spot for the array size encoding */
 		pNewAllocationBase += 1;
