@@ -27,6 +27,12 @@ public:
 		this->Alloc(uSize);
 	}
 
+	ZArray(ZArray<T>* r)
+	{
+		this->a = nullptr;
+		this = r; // TODO make sure this is using the overloaded operator
+	}
+
 	~ZArray()
 	{
 		this->RemoveAll();
@@ -37,7 +43,7 @@ public:
 		// TODO
 	}
 
-	T& operator[](int i)
+	T& operator[](size_t i)
 	{
 		return this->a[i];
 	}
@@ -47,21 +53,97 @@ public:
 		return this->GetCount() == 0;
 	}
 
-	T* Insert()
+	T* Insert(T* e, int nIdx = -1)
 	{
-		return nullptr; // TODO
+		T* result = this->InsertBefore(e); // TODO
+
 	}
 
-	T* InsertBefore(int nIndex)
+	T* InsertBefore(int nIdx = -1)
 	{
-		return nullptr; // TODO
+		BOOL   bAllocateMoreMemory;
+		size_t uSizeToAllocate;
+		size_t uAllocationBytes;
+		size_t uCount = this->GetCount();
+
+		if (nIdx == -1) nIdx = uCount;
+
+		/* Determine if more space is required to fit another T object into the array */
+		if (this->a)
+		{
+			/* Grab size of allocation block -- remember, ZAllocEx encodes this at the head of each block */
+			uAllocationBytes = reinterpret_cast<DWORD*>(this->a)[-2];
+
+			if (uAllocationBytes > INT_MAX) // this means its negative since the datatype is unsigned
+			{
+				uAllocationBytes = ~uAllocationBytes;
+			}
+			/* If there is enough space is the allocation block for another object, do not allocate more memory */
+			bAllocateMoreMemory = (uAllocationBytes - sizeof(PVOID)) / sizeof(T) <= uCount;
+		}
+		else
+		{
+			bAllocateMoreMemory = TRUE;
+		}
+
+		if (bAllocateMoreMemory)
+		{
+			if (uCount)
+			{
+				/* Always double the existing array size so we don't have to allocate mem as often */
+				uSizeToAllocate = 2 * uCount;
+			}
+			else
+			{
+				uSizeToAllocate = 1;
+			}
+
+			this->Reserve(uSizeToAllocate);
+		}
+
+		/* Increase array count by one */
+		size_t* pCount = &reinterpret_cast<size_t*>(this->a)[-1];
+		*pCount += 1;
+
+		T* pDest = &this->a[nIdx + 1];
+		T* pSrc = &this->a[nIdx];
+		size_t uSize = sizeof(T) * (uCount - nIdx);
+
+		/* Shift memory to make space for the new object */
+		memmove(pDest, pSrc, uSize);
+
+		/* Initialize new memory space with T constructor */
+		this->a[nIdx] = T();
+
+		/* Return pointer to new object */
+		return &this->a[nIdx];
+	}
+
+	T* InsertAfter(T* e, size_t nIdx)
+	{
+		return nullptr;
+	}
+
+	void RemoveAt(size_t nIdx)
+	{
+		this->RemoveAt(&this->a[nIdx]);
 	}
 
 	void RemoveAt(T* pos) // TODO test this
 	{
-		pos->~T(); // or just delete pos?
+		pos->~T();
 
-		memmove(pos, &pos[1], sizeof(T) * (this->GetCount() * this->IndexOf(pos) / sizeof(T)));
+		T* pItemToRemove = pos;
+		T* pNextItem = pos + 1;
+
+		size_t nItemIdx = this->IndexOf(pNextItem);
+		size_t nItemsToMove = this->GetCount() - nItemIdx;
+		size_t nBytesToMove = nItemsToMove * sizeof(T);
+
+		memmove(pItemToRemove, pNextItem, nBytesToMove);
+
+		size_t* pCount = &reinterpret_cast<size_t*>(this->a)[-1];
+		*pCount -= 1;
 	}
 
 	/// <summary>
@@ -69,7 +151,15 @@ public:
 	/// </summary>
 	size_t GetCount()
 	{
-		return this->a ? reinterpret_cast<DWORD*>(this->a)[-1] : 0;
+		if (this->a)
+		{
+			size_t nCount = reinterpret_cast<size_t*>(this->a)[-1];
+			return nCount;
+		}
+		else
+		{
+			return 0;
+		}
 	}
 
 	/// <summary>
@@ -78,7 +168,7 @@ public:
 	/// </summary>
 	UINT IndexOf(T* pos)
 	{
-		return pos - this->a; // compiler automatically divides by size or something here
+		return pos - this->a; // compiler automatically does the math here so all we need to write is the subtraction
 	}
 
 	/// <summary>
@@ -90,7 +180,7 @@ public:
 	{
 		T* result = *pos;
 
-		*pos = *pos > this->a ? result - 1 : nullptr;
+		*pos = *pos > this->a ? &result[-1] : nullptr;
 
 		return result;
 	}
@@ -105,16 +195,16 @@ public:
 		T* result = *pos;
 
 		/* Highest index is array size - 1 */
-		DWORD nIndex = *(reinterpret_cast<DWORD*>(this->a) - 1); // get array size
-		nIndex -= 1; // reduce index by 1
+		size_t nIndex = reinterpret_cast<size_t*>(this->a)[-1];
+		nIndex -= 1;
 
-		if (*pos >= &this->a[nIndex]) // TODO verify this is correct
+		if (*pos < &this->a[nIndex])
 		{
-			*pos = nullptr;
+			*pos = result + 1;
 		}
 		else
 		{
-			*pos = result + 1;
+			*pos = nullptr;
 		}
 
 		return result;
@@ -125,9 +215,15 @@ public:
 	/// </summary>
 	T* GetHeadPosition()
 	{
-		size_t nCount = this->GetCount();
-
-		return nCount > 0 ? &this->a[nCount - 1] : nullptr;
+		if (this->a)
+		{
+			size_t nCount = reinterpret_cast<size_t*>(this->a)[-1];
+			return &this->a[nCount - 1];
+		}
+		else
+		{
+			return nullptr;
+		}
 	}
 
 	/// <summary>
@@ -137,10 +233,12 @@ public:
 	{
 		if (this->a)
 		{
-			DWORD* pAllocationBasePointer = reinterpret_cast<DWORD*>(this->a) - 1;
+			/* Get pointer to allocation base  (array base - 4 bytes) */
+			DWORD* pAllocationBasePointer = &reinterpret_cast<DWORD*>(this->a)[-1];
+			size_t nMaxIndex = *pAllocationBasePointer - 1;
 
 			/* Call destructor  */
-			this->Destroy(this->a, &this->a[*pAllocationBasePointer]);
+			this->Destroy(this->a, &this->a[nMaxIndex]);
 
 			/* Free array allocation */
 			ZAllocEx<ZAllocAnonSelector>::GetInstance()->Free((void**)pAllocationBasePointer);
@@ -161,7 +259,7 @@ private:
 	{
 		for (T* i = start; i < end; i++)
 		{
-			i->~T(); // or is it just delete i?
+			i->~T();
 		}
 	}
 
@@ -183,7 +281,7 @@ private:
 		this->a = reinterpret_cast<T*>(pAlloc + 1);
 	}
 
-	void Realloc(size_t uNewArraySize, int nMode) // Has an extra parameter (ZAllocHelper*) that I think is used for memory profiling the debug build
+	void Realloc(size_t uNewArraySize, int nMode) // Has an extra arg (ZAllocHelper*) that may be used for memory profiling debug builds
 	{
 		size_t uCurArraySize, // current number of max items
 			uMaxCountInAllocBlock; // max items that will fit inside of the allocated memory block
@@ -255,7 +353,7 @@ private:
 		if (this->a)
 		{
 			/* Reassign value at array size pointer to match new size */
-			DWORD* pdwArraySize = reinterpret_cast<DWORD*>(this->a) - 1;
+			DWORD* pdwArraySize = &reinterpret_cast<DWORD*>(this->a)[-1];
 			*pdwArraySize = uNewArraySize;
 		}
 	}
@@ -263,20 +361,21 @@ private:
 	void Reserve(size_t uItems)
 	{
 		size_t uCurArraySize;
+		size_t uAllocationSize;
 		size_t uMaxCountInAllocBlock;
 
 		if (this->a)
 		{
 			/* Grab size of allocation block -- remember, ZAllocEx encodes this at the head of each block */
-			uMaxCountInAllocBlock = reinterpret_cast<DWORD*>(this->a)[-2];
+			uAllocationSize = reinterpret_cast<DWORD*>(this->a)[-2];
 
-			if (uMaxCountInAllocBlock > INT_MAX) // this means its negative since the datatype is unsigned
+			if (uAllocationSize > INT_MAX) // this means its negative since the datatype is unsigned
 			{
-				uMaxCountInAllocBlock = ~uMaxCountInAllocBlock;
+				uAllocationSize = ~uAllocationSize;
 			}
 
 			/* Determine the real number of array item slots based on the allocation block header */
-			uMaxCountInAllocBlock = (uMaxCountInAllocBlock - 4) / sizeof(T);
+			uMaxCountInAllocBlock = (uAllocationSize - sizeof(PVOID)) / sizeof(T);
 		}
 		else
 		{
@@ -288,9 +387,12 @@ private:
 		uCurArraySize = this->GetCount();
 
 		/* Allocate new block */
-		PVOID pNewAllocationBase = ZAllocEx<ZAllocAnonSelector>::GetInstance()->Alloc(sizeof(T) * uItems + sizeof(PVOID));
+		DWORD* pNewAllocationBase = (DWORD*)ZAllocEx<ZAllocAnonSelector>::GetInstance()->Alloc(sizeof(T) * uItems + sizeof(PVOID));
 
-		/* Increment allocation base to save a spot for the array size encoding */
+		/* Encode new array size at allocation base */
+		*pNewAllocationBase = uCurArraySize;
+
+		/* Increment allocation base */
 		pNewAllocationBase += 1;
 
 		if (this->a)
@@ -299,15 +401,15 @@ private:
 			memcpy(pNewAllocationBase, this->a, sizeof(T) * uCurArraySize);
 
 			/* Free old memory allocation */
-			void** pCurrentAllocationBase = reinterpret_cast<void**>(this->a) - 1;
-			ZAllocEx<ZAllocAnonSelector>::Free(pCurrentAllocationBase);
+			void** pCurrentAllocationBase = &reinterpret_cast<void**>(this->a)[-1];
+			ZAllocEx<ZAllocAnonSelector>::GetInstance()->Free(pCurrentAllocationBase);
 		}
 
-		this->a = pNewAllocationBase;
+		this->a = reinterpret_cast<T*>(pNewAllocationBase);
 
 		/* Reassign value at array size pointer to match new size */
-		DWORD* pdwArraySize = reinterpret_cast<DWORD*>(this->a) - 1;
-		*pdwArraySize = uCurArraySize;
+		/*DWORD* pdwArraySize = &reinterpret_cast<DWORD*>(this->a)[-1];
+		*pdwArraySize = uCurArraySize;*/
 	}
 };
 

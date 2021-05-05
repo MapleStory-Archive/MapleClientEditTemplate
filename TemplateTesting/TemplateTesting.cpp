@@ -21,9 +21,11 @@ int main()
 
 	auto head = arr.GetHeadPosition();
 
-	int idx = arr.IndexOf(head);
+	arr.GetNext(&head);
 
 	arr.RemoveAt(head);
+
+	arr.RemoveAt(arr.GetHeadPosition());
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
