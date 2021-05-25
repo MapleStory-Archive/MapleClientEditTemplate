@@ -47,7 +47,12 @@ namespace CommonUnitTesting
 
 			ZArrayDummyTest()
 			{
-				test_number = 42;
+				this->test_number = 42;
+			}
+
+			ZArrayDummyTest(ZArrayDummyTest* pToCopy)
+			{
+				this->test_number = pToCopy->test_number;
 			}
 		};
 
@@ -102,13 +107,22 @@ namespace CommonUnitTesting
 			}
 		}
 
+		// observing the duration of this function vs the one below will showcase just how much
+		// faster it is to use maples block/pool allocation method instead of malloc/free
+		/*TEST_METHOD(MassMallocTesting)
+		{
+			for (int i = 0; i < 250; i++)
+			{
+				for (int j = 0; j < 50000; j++)
+				{
+					PVOID pAlloc = malloc(100);
+					free(pAlloc);
+				}
+			}
+		}*/
+
 		TEST_METHOD(InsertRemoveTesting)
 		{
-			/* 
-				was running into some allocation errors here but they dont seem 
-				to be happening 
-			*/
-
 			ZArray<SizeTest10> arr1 = ZArray<SizeTest10>();
 			ZArray<SizeTest20> arr2 = ZArray<SizeTest20>();
 			ZArray<SizeTest40> arr3 = ZArray<SizeTest40>();
@@ -118,9 +132,13 @@ namespace CommonUnitTesting
 
 			for (int i = 0; i < 250; i++)
 			{
+				size_t aSizes[6] = { 0 };
+
 				for (int j = 0; j < 50000; j++)
 				{
-					switch (rand() % 6)
+					int nRand = rand() % 6;
+					aSizes[nRand] += 1;
+					switch (nRand)
 					{
 					case 0:
 						arr1.InsertBefore();
@@ -143,6 +161,15 @@ namespace CommonUnitTesting
 					}
 				}
 
+				/* Verify array size is correct */
+				Assert::AreEqual(aSizes[0], arr1.GetCount());
+				Assert::AreEqual(aSizes[1], arr2.GetCount());
+				Assert::AreEqual(aSizes[2], arr3.GetCount());
+				Assert::AreEqual(aSizes[3], arr4.GetCount());
+				Assert::AreEqual(aSizes[4], arr5.GetCount());
+				Assert::AreEqual(aSizes[5], arr6.GetCount());
+
+				/* Remove items one at a time */
 				while (arr1.GetCount())
 				{
 					arr1.RemoveAt(arr1.GetCount() - 1);
@@ -168,12 +195,33 @@ namespace CommonUnitTesting
 					arr6.RemoveAt(arr6.GetCount() - 1);
 				}
 
+				/* Verify array size is correct */
 				Assert::AreEqual((size_t)0, arr1.GetCount());
 				Assert::AreEqual((size_t)0, arr2.GetCount());
 				Assert::AreEqual((size_t)0, arr3.GetCount());
 				Assert::AreEqual((size_t)0, arr4.GetCount());
 				Assert::AreEqual((size_t)0, arr5.GetCount());
 				Assert::AreEqual((size_t)0, arr6.GetCount());
+			}
+		}
+
+		TEST_METHOD(EqualsOperatorTesting)
+		{
+			ZArray<ZArrayDummyTest> arr1 = ZArray<ZArrayDummyTest>();
+			ZArray<ZArrayDummyTest> arr2 = ZArray<ZArrayDummyTest>();
+
+			for (int i = 0; i < 100; i++)
+			{
+				auto x = arr1.InsertBefore();
+				x->test_number += i;
+			}
+
+			arr2 = arr1;
+
+			for (int i = 0; i < 100; i++)
+			{
+				Assert::AreEqual(42 + i, arr1[i].test_number);
+				Assert::AreEqual(arr1[i].test_number, arr2[i].test_number);
 			}
 		}
 	};

@@ -40,7 +40,35 @@ public:
 
 	ZArray<T>* operator=(ZArray<T>* r)
 	{
-		// TODO
+		if (this == r) return this;
+
+		this->RemoveAll();
+
+		size_t uCount = r->GetCount();
+
+		if (uCount)
+		{
+			/* Allocate new memory for array copy */
+			PVOID pAlloc = ZAllocEx<ZAllocAnonSelector>::Alloc(sizeof(T) * uCount + sizeof(T));
+
+			/* Assign array count to head address */
+			*(DWORD*)pAlloc = uCount;
+
+			pAlloc += 1; // first address holds count, second address is pointer to start of ZArray
+
+			T* pHead = &r->a[uCount];
+
+			if (r->a < pHead)
+			{
+				for (int i = 0; i < uCount; i++)
+				{
+					this->a[i] = T(r->a[i]); // copy constructors are required for classes to be used here
+				}
+			}
+		}
+
+
+		return this;
 	}
 
 	T& operator[](size_t i)
@@ -56,7 +84,7 @@ public:
 	T* Insert(T* e, int nIdx = -1)
 	{
 		T* result = this->InsertBefore(e); // TODO
-		*result = *e;
+		*result = *e; // operator= overloading is required to make it function as the PDB does
 		return result;
 	}
 
@@ -118,11 +146,6 @@ public:
 
 		/* Return pointer to new object */
 		return &this->a[nIdx];
-	}
-
-	T* InsertAfter(T* e, size_t nIdx)
-	{
-		return nullptr;
 	}
 
 	void RemoveAt(size_t nIdx)
