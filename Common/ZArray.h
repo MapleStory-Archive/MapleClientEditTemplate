@@ -56,7 +56,8 @@ public:
 	T* Insert(T* e, int nIdx = -1)
 	{
 		T* result = this->InsertBefore(e); // TODO
-
+		*result = *e;
+		return result;
 	}
 
 	T* InsertBefore(int nIdx = -1)

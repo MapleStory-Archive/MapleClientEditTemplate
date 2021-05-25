@@ -36,7 +36,7 @@
     <ClCompile Include="ZXStringUnitTesting.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
-    <ClCompile Include="ZArrayUnitTestting.cpp">
+    <ClCompile Include="ZArrayUnitTesting.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
   </ItemGroup>
