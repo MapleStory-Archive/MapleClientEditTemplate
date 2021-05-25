@@ -417,25 +417,10 @@ public:
 
 /* Global memory management overloading */
 
-void* operator new(size_t uSize)
-{
-	return ZAllocEx<ZAllocAnonSelector>::GetInstance()->Alloc(uSize);
-}
-
-void* operator new[](size_t uSize)
-{
-	return ZAllocEx<ZAllocAnonSelector>::GetInstance()->Alloc(uSize);
-}
-
-void operator delete(void* p)
-{
-	ZAllocEx<ZAllocAnonSelector>::GetInstance()->Free((void**)p);
-}
-
-void operator delete[](void* p)
-{
-	ZAllocEx<ZAllocAnonSelector>::GetInstance()->Free((void**)p);
-}
+void* operator new(size_t uSize);
+void* operator new[](size_t uSize);
+void operator delete(void* p);
+void operator delete[](void* p);
 
 assert_size(sizeof(ZAllocEx<ZAllocAnonSelector>), 0x2C)
 assert_size(sizeof(ZAllocEx<ZAllocStrSelector<char>>), 0x2C)

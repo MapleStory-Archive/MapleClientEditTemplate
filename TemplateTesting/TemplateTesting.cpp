@@ -8,22 +8,85 @@
 #include "ZRef.h"
 #include "ZtlSecure.h"
 #include <TSecType.h>
+#include "ZArray.h"
+
+struct SizeTest10
+{
+public:
+	char aPad[10];
+};
+struct SizeTest20
+{
+public:
+	char aPad[20];
+};
+struct SizeTest40
+{
+public:
+	char aPad[40];
+};
+struct SizeTest80
+{
+public:
+	char aPad[80];
+};
+struct SizeTest160
+{
+public:
+	char aPad[160];
+};
+struct SizeTest320
+{
+public:
+	char aPad[320];
+};
 
 int main()
 {
-	TSecType<long> ts1 = 0;
-	ts1 = (long)0;
+	std::cout << "test begin\r\n";
+	ZArray<SizeTest10> arr1 = ZArray<SizeTest10>();
+	ZArray<SizeTest20> arr2 = ZArray<SizeTest20>();
+	ZArray<SizeTest40> arr3 = ZArray<SizeTest40>();
+	ZArray<SizeTest80> arr4 = ZArray<SizeTest80>();
+	ZArray<SizeTest160> arr5 = ZArray<SizeTest160>();
+	ZArray<SizeTest320> arr6 = ZArray<SizeTest320>();
 
-	int z = ts1.GetData();
+	for (int i = 0; i < 100; i++)
+	{
+		for (int j = 0; j < 2500; j++)
+		{
+			switch (rand() % 6)
+			{
+			case 0:
+				arr1.InsertBefore();
+				break;
+			case 1:
+				arr2.InsertBefore();
+				break;
+			case 2:
+				arr3.InsertBefore();
+				break;
+			case 3:
+				arr4.InsertBefore();
+				break;
+			case 4:
+				arr5.InsertBefore();
+				break;
+			case 5:
+				arr6.InsertBefore();
+				break;
+			}
+		}
 
-	ts1 = 20;
+		std::cout << "arr1 size: " << arr1.GetCount() << "\r\n";
 
-	z = ts1.GetData();
-
-	SECPOINT sp2 = SECPOINT(15, 20);
-
-	int x = sp2.x.GetData();
-	int y = sp2.y.GetData();
+		arr1.RemoveAll();
+		arr2.RemoveAll();
+		arr3.RemoveAll();
+		arr4.RemoveAll();
+		arr5.RemoveAll();
+		arr6.RemoveAll();
+	}
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
