@@ -70,38 +70,40 @@ public:
 
 	/***=========== ADD HEAD ===========***/
 
-	T* AddHead()
-	{
-		T* pAlloc = this->New(nullptr, this->m_pHead);
+	/* TODO fix: doesnt work hehe */
 
-		if (this->m_pTail)
-		{
-			ZRefCountedDummy<T>* pNode = pAlloc ? this->CastNode(pAlloc) : nullptr;
-			ZRefCountedDummy<T>* pHeadNode = this->CastNode(this->m_pHead);
+	//T* AddHead()
+	//{
+	//	T* pAlloc = this->New(nullptr, this->m_pHead);
 
-			pHeadNode->m_pPrev = pNode;
-			this->m_pHead = pAlloc;
-		}
-		else
-		{
-			this->m_pHead = pAlloc;
-			this->m_pTail = pAlloc;
-		}
+	//	if (this->m_pTail)
+	//	{
+	//		ZRefCountedDummy<T>* pNode = pAlloc ? this->CastNode(pAlloc) : nullptr;
+	//		ZRefCountedDummy<T>* pHeadNode = this->CastNode(this->m_pHead);
 
-		return pAlloc;
-	}
+	//		pHeadNode->m_pPrev = pNode;
+	//		this->m_pHead = pAlloc;
+	//	}
+	//	else
+	//	{
+	//		this->m_pHead = pAlloc;
+	//		this->m_pTail = pAlloc;
+	//	}
 
-	T* AddHead(T* d)
-	{
-		T* pNewHead = this->AddHead();
-		*pNewHead = *d;
-		return pNewHead;
-	}
+	//	return pAlloc;
+	//}
 
-	T* AddHead(ZList<T>* l)
-	{
-		return nullptr; // TODO
-	}
+	//T* AddHead(T* d)
+	//{
+	//	T* pNewHead = this->AddHead();
+	//	*pNewHead = *d;
+	//	return pNewHead;
+	//}
+
+	//T* AddHead(ZList<T>* l)
+	//{
+	//	return nullptr; // TODO
+	//}
 
 	/***=========== ADD TAIL ===========***/
 
@@ -133,7 +135,7 @@ public:
 		return pNewTail;
 	}
 
-	T* AddTail(ZList<T>* l)
+	T* AddTail(ZList<T>* l) // TODO test this, currently untested and prolly not working
 	{
 		T* pHead = l->m_pHead;
 
@@ -142,7 +144,7 @@ public:
 			T* pNext = pHead;
 
 			ZRefCountedDummy<T>* pNode = this->CastNode(pHead);
-			ZRefCountedDummy<T>* pNodePrev = this->CastNode(pNode->m_pPrev);
+			ZRefCountedDummy<T>* pNodePrev = reinterpret_cast<ZRefCountedDummy<T>*>(pNode->m_pPrev);
 
 			pHead = pNodePrev ? pNodePrev->t : nullptr;
 
@@ -161,7 +163,7 @@ public:
 		{
 			T* pItem = this->GetNext(&pPosition);
 
-			pItem->~T();
+			delete this->CastNode(pItem); // IMPORTANT: must delete the node, not the wrapped object (T)
 		}
 
 		this->m_pTail = nullptr;
@@ -171,7 +173,42 @@ public:
 
 	void RemoveAt(T* pos)
 	{
-		// TODO
+		ZRefCountedDummy<T>* pNodeDelete = pos ? this->CastNode(pos) : nullptr;
+
+		if (pNodeDelete->m_pPrev)
+		{
+			ZRefCountedDummy<T>* pPrevNode = reinterpret_cast<ZRefCountedDummy<T>*>(pNodeDelete->m_pPrev);
+
+			if (pNodeDelete->m_pNext)
+			{
+				ZRefCountedDummy<T>* pNextNode = reinterpret_cast<ZRefCountedDummy<T>*>(pNodeDelete->m_pNext);
+
+				pPrevNode->m_pNext = pNodeDelete->m_pNext;
+				pNextNode->m_pPrev = pNodeDelete->m_pPrev;
+			}
+			else // there is no node after the deleted node, meaning the deleted node is the tail node
+			{
+				// the node prior to the deleted node is the new tail
+				pPrevNode->m_pNext = nullptr;
+				this->m_pTail = &pPrevNode->t;
+			}
+		}
+		else if (pNodeDelete->m_pNext)
+		{
+			ZRefCountedDummy<T>* pNextNode = reinterpret_cast<ZRefCountedDummy<T>*>(pNodeDelete->m_pNext);
+
+			pNextNode->m_pPrev = nullptr;
+			this->m_pHead = &pNextNode->t;
+		}
+		else // no next and no prev node
+		{
+			this->m_pTail = nullptr;
+			this->m_pHead = nullptr;
+		}
+
+		this->m_uCount -= 1;
+
+		delete pNodeDelete; // IMPORTANT: must delete the node, not the wrapped object (T)
 	}
 
 	/***=========== NODE SEARCH ===========***/

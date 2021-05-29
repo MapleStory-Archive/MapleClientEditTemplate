@@ -50,8 +50,8 @@ private:
 
 		for (int i = 0; i < 4; i++)
 		{
-			m_apBuff[i] = 0;
-			m_apBlockHead[i] = 0;
+			m_apBuff[i] = nullptr;
+			m_apBlockHead[i] = nullptr;
 		}
 	}
 
@@ -250,8 +250,8 @@ private:
 
 		for (int i = 0; i < 4; i++)
 		{
-			m_apBuff[i] = 0;
-			m_apBlockHead[i] = 0;
+			m_apBuff[i] = nullptr;
+			m_apBlockHead[i] = nullptr;
 		}
 	}
 

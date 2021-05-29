@@ -11,36 +11,27 @@
 #include "ZArray.h"
 #include "ZList.h"
 
+struct test
+{
+	int val;
+	~test()
+	{
+		std::cout << "destroying";
+	}
+};
+
 int main()
 {
-	auto list = ZList<int>();
+	auto list = ZList<test>();
 
-	int poo = 40;
-	int pee = 30;
-	int paa = 20;
-	int poo2 = 10;
-
-	/*list.AddTail(&poo);
-	list.AddTail(&pee);
-	list.AddTail(&paa);
-	list.AddTail(&poo2);*/
-
-	list.AddHead(&poo);
-	list.AddHead(&pee);
-	list.AddHead(&paa);
-	list.AddHead(&poo2);
-
-	PINT peepaa = list.GetHeadPosition();
-	while (peepaa)
+	for (int i = 0; i < 4; i++)
 	{
-		auto poopee = list.GetNext(&peepaa);
+		auto n = new test();
+		n->val = i;
+		list.AddTail(n);
 	}
 
-	peepaa = list.GetTailPosition();
-	while (peepaa)
-	{
-		auto poopee = list.GetPrev(&peepaa);
-	}
+	int x = 1;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

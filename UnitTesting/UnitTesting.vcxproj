@@ -173,6 +173,7 @@
     </ClCompile>
     <ClCompile Include="TSecTypeUnitTesting.cpp" />
     <ClCompile Include="ZArrayUnitTesting.cpp" />
+    <ClCompile Include="ZListUnitTesting.cpp" />
     <ClCompile Include="ZRefUnitTesting.cpp" />
     <ClCompile Include="ZtlSecureUnitTesting.cpp" />
     <ClCompile Include="ZXStringUnitTesting.cpp" />
