@@ -72,21 +72,21 @@ public:
 
 	T* AddHead()
 	{
-		T* pAlloc = this->New(this->m_pHead, nullptr);
+		T* pAlloc = this->New(nullptr, this->m_pHead);
 
-		if (!this->m_pTail)
-		{
-			this->m_pTail = pAlloc;
-		}
-		else
+		if (this->m_pTail)
 		{
 			ZRefCountedDummy<T>* pNode = pAlloc ? this->CastNode(pAlloc) : nullptr;
 			ZRefCountedDummy<T>* pHeadNode = this->CastNode(this->m_pHead);
 
-			pHeadNode->m_pNext = pNode;
+			pHeadNode->m_pPrev = pNode;
+			this->m_pHead = pAlloc;
 		}
-
-		this->m_pHead = pAlloc;
+		else
+		{
+			this->m_pHead = pAlloc;
+			this->m_pTail = pAlloc;
+		}
 
 		return pAlloc;
 	}
@@ -206,7 +206,7 @@ public:
 
 		ZRefCountedDummy<T>* pNode = this->CastNode(pRet);
 
-		*pos = pNode->m_pNext ? &this->CastNode((T*)pNode->m_pNext)->t : nullptr;
+		*pos = pNode->m_pNext ? &reinterpret_cast<ZRefCountedDummy<T>*>(pNode->m_pNext)->t : nullptr;
 
 		return pRet;
 	}
@@ -217,7 +217,7 @@ public:
 
 		ZRefCountedDummy<T>* pNode = this->CastNode(pRet);
 
-		*pos = pNode->m_pPrev ? &this->CastNode((T*)pNode->m_pPrev)->t : nullptr;
+		*pos = pNode->m_pPrev ? &reinterpret_cast<ZRefCountedDummy<T>*>(pNode->m_pPrev)->t : nullptr;
 
 		return pRet;
 	}
