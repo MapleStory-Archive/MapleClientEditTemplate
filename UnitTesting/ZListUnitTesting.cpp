@@ -131,7 +131,27 @@ namespace CommonUnitTesting
 			/* Remove all items using tail pointer */
 			for (int i = 0; i < 5; i++)
 			{
+				PINT pTail = list.GetTailPosition();
 
+				/* Verify initial pointer is correct */
+				Assert::AreEqual(50 - (10 * i), *pTail);
+
+				list.RemoveAt(pTail);
+
+				/* Verify new head has the correct value */
+				if (i == 4)
+				{
+					/* Last item removed, list is now empty */
+					Assert::AreEqual((int*)nullptr, list.GetHeadPosition());
+					Assert::AreEqual((int*)nullptr, list.GetTailPosition());
+				}
+				else
+				{
+					Assert::AreEqual(40 - (10 * i), *list.GetTailPosition());
+				}
+
+				/* Verify remaining size of array is correct */
+				Assert::AreEqual((size_t)(4 - i), list.GetCount());
 			}
 
 			/* Re-populate list with array item pointers */
@@ -141,7 +161,22 @@ namespace CommonUnitTesting
 			}
 
 			/* Remove item from middle of list */
+			PINT pHead = list.GetHeadPosition();
+			list.GetNext(&pHead); // scroll forward
+			list.GetNext(&pHead); // scroll forward
 
+			list.RemoveAt(pHead); // remove pHead
+
+			Assert::AreEqual((size_t)4, list.GetCount());
+
+			pHead = list.GetHeadPosition();
+
+			/* Verify node with value 30 has been removed */
+			Assert::AreEqual(10, *list.GetNext(&pHead));
+			Assert::AreEqual(20, *list.GetNext(&pHead));
+			Assert::AreEqual(40, *list.GetNext(&pHead));
+			Assert::AreEqual(50, *list.GetNext(&pHead));
+			Assert::AreEqual((int*)nullptr, list.GetNext(&pHead));
 
 			/* Re-populate list with array item pointers */
 			for (int i = 0; i < 5; i++)

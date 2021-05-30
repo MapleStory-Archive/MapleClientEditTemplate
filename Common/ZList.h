@@ -175,7 +175,7 @@ public:
 	{
 		ZRefCountedDummy<T>* pNodeDelete = pos ? this->CastNode(pos) : nullptr;
 
-		if (pNodeDelete->m_pPrev)
+		if (pNodeDelete && pNodeDelete->m_pPrev)
 		{
 			ZRefCountedDummy<T>* pPrevNode = reinterpret_cast<ZRefCountedDummy<T>*>(pNodeDelete->m_pPrev);
 
@@ -193,7 +193,7 @@ public:
 				this->m_pTail = &pPrevNode->t;
 			}
 		}
-		else if (pNodeDelete->m_pNext)
+		else if (pNodeDelete && pNodeDelete->m_pNext)
 		{
 			ZRefCountedDummy<T>* pNextNode = reinterpret_cast<ZRefCountedDummy<T>*>(pNodeDelete->m_pNext);
 
@@ -213,33 +213,132 @@ public:
 
 	/***=========== NODE SEARCH ===========***/
 
-	T* FindIndex(const size_t uIndex)
+	T* FindIndex(const size_t uIndex) // TODO test this
 	{
-		// TODO
+		T* pRet;
+
+		if (uIndex <= this->m_uCount >> 1)
+		{
+			pRet = this->m_pHead;
+
+			int i = this->m_uCount - 1;
+			while (i > uIndex)
+			{
+				if (!pRet) break;
+				i -= 1;
+
+				ZRefCounted* pNode = this->CastNode(pRet)->m_pNext;
+
+				if (pNode) pRet = &reinterpret_cast<ZRefCountedDummy<T>*>(pNode)->t;
+			}
+		}
+		else
+		{
+			pRet = this->m_pTail;
+
+			int i = this->m_uCount - 1;
+			while (i > uIndex)
+			{
+				if (!pRet) break;
+				i -= 1;
+
+				ZRefCounted* pNode = this->CastNode(pRet)->m_pPrev;
+
+				if (pNode) pRet = &reinterpret_cast<ZRefCountedDummy<T>*>(pNode)->t;
+			}
+		}
+
+		return pRet;
 	}
 
-	int IndexOf(T* pos)
+#define ZLIST_INVALID_INDEX -1
+
+	int IndexOf(const T* pos) // TODO test this
 	{
-		// TODO
+		T* pHead = this->m_pHead;
+		int nRet = 0;
+
+		if (!pHead) return ZLIST_INVALID_INDEX;
+
+		while (pHead != pos)
+		{
+			nRet += 1;
+
+			ZRefCountedDummy<T>* pNode = this->CastNode(pHead);
+
+			if (!pNode->m_pNext) return ZLIST_INVALID_INDEX;
+
+			pHead = &reinterpret_cast<ZRefCountedDummy<T>*>(pNode->m_pNext)->t;
+
+			if (!pHead) return  ZLIST_INVALID_INDEX;
+		}
+
+		if (!pHead) return ZLIST_INVALID_INDEX;
+
+		return nRet;
+	}
+
+	T* Find(const T* d, const T* posAfter) // TODO test this
+	{
+		T* pRet;
+		if (posAfter)
+		{
+			ZRefCountedDummy<T>* pNode = this->CastNode(posAfter);
+
+			if (!pNode || !pNode->m_pNext) return nullptr;
+
+			pRet = &reinterpret_cast<ZRefCountedDummy<T>*>(pNode->m_pNext)->t;
+		}
+		else
+		{
+			pRet = this->m_pHead;
+		}
+
+		if (!pRet) return nullptr;
+
+		while (*pRet != *d)
+		{
+			ZRefCountedDummy<T>* pNode = this->CastNode(pRet);
+
+			if (pNode && pNode->m_pNext)
+			{
+				pRet = &reinterpret_cast<ZRefCountedDummy<T>*>(pNode->m_pNext)->t;
+
+				if (pRet) continue;
+			}
+
+			return nullptr;
+		}
+
+		return pRet;
 	}
 
 	/***=========== INSERTION ===========***/
 
 	T* Insert(T* d)
 	{
-		T* result = this->AddTail(this);
+		//T* result = this->AddTail(this);
+		return nullptr; // TODO
 	}
 
 	T** InsertBefore(T* pos)
 	{
-
+		return nullptr; // TODO
 	}
 
 	/***=========== TRAVERSAL ===========***/
 
 	T* GetNext(T** pos)
 	{
+		if (!pos) return nullptr;
+
 		T* pRet = *pos;
+
+		if (!pRet)
+		{
+			*pos = nullptr;
+			return nullptr;
+		}
 
 		ZRefCountedDummy<T>* pNode = this->CastNode(pRet);
 
@@ -250,7 +349,15 @@ public:
 
 	T* GetPrev(T** pos)
 	{
+		if (!pos) return nullptr;
+
 		T* pRet = *pos;
+
+		if (!pRet)
+		{
+			*pos = nullptr;
+			return nullptr;
+		}
 
 		ZRefCountedDummy<T>* pNode = this->CastNode(pRet);
 
