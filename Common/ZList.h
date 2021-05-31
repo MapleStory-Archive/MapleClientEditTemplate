@@ -213,11 +213,11 @@ public:
 
 	/***=========== NODE SEARCH ===========***/
 
-	T* FindIndex(const size_t uIndex) // TODO test this
+	T* FindIndex(const size_t uIndex) // TODO fix this
 	{
 		T* pRet;
 
-		if (uIndex <= this->m_uCount >> 1)
+		if (uIndex <= this->m_uCount / 2)
 		{
 			pRet = this->m_pHead;
 
@@ -253,7 +253,7 @@ public:
 
 #define ZLIST_INVALID_INDEX -1
 
-	int IndexOf(const T* pos) // TODO test this
+	int IndexOf(const T* pos)
 	{
 		T* pHead = this->m_pHead;
 		int nRet = 0;
@@ -278,14 +278,19 @@ public:
 		return nRet;
 	}
 
-	T* Find(const T* d, const T* posAfter) // TODO test this
+	/// <summary>
+	/// Tries to find a node in the list with the same value as the given node d.
+	/// If posAfter is defined, the function will only search for items after the given posAfter item.
+	/// If posAfter is defined but is not a list node, undefined behavior will occur.
+	/// </summary>
+	T* Find(const T* d, T* posAfter)
 	{
 		T* pRet;
 		if (posAfter)
 		{
 			ZRefCountedDummy<T>* pNode = this->CastNode(posAfter);
 
-			if (!pNode || !pNode->m_pNext) return nullptr;
+			if (!pNode->m_pNext) return nullptr;
 
 			pRet = &reinterpret_cast<ZRefCountedDummy<T>*>(pNode->m_pNext)->t;
 		}
@@ -300,7 +305,7 @@ public:
 		{
 			ZRefCountedDummy<T>* pNode = this->CastNode(pRet);
 
-			if (pNode && pNode->m_pNext)
+			if (pNode->m_pNext)
 			{
 				pRet = &reinterpret_cast<ZRefCountedDummy<T>*>(pNode->m_pNext)->t;
 
