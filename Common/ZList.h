@@ -4,12 +4,13 @@
 
 /// <summary>
 /// Emulation of MapleStory's implementation of a doubly linked list template.
-/// 
 /// </summary>
 /// <typeparam name="T"></typeparam>
 template <typename T>
 class ZList : ZRefCountedAccessor<T>, ZRefCountedAccessor<ZRefCountedDummy<T>>
 {
+#define ZLIST_INVALID_INDEX -1
+
 private:
 	char gap4[1];
 	size_t m_uCount;
@@ -217,15 +218,15 @@ public:
 	{
 		T* pRet;
 
+		if (uIndex >= this->m_uCount) return nullptr;
+
 		if (uIndex <= this->m_uCount / 2)
 		{
 			pRet = this->m_pHead;
 
-			int i = this->m_uCount - 1;
-			while (i > uIndex)
+			for (int i = 0; i < uIndex; i++)
 			{
 				if (!pRet) break;
-				i -= 1;
 
 				ZRefCounted* pNode = this->CastNode(pRet)->m_pNext;
 
@@ -236,11 +237,9 @@ public:
 		{
 			pRet = this->m_pTail;
 
-			int i = this->m_uCount - 1;
-			while (i > uIndex)
+			for (int i = this->m_uCount - 1; i > uIndex; i--)
 			{
 				if (!pRet) break;
-				i -= 1;
 
 				ZRefCounted* pNode = this->CastNode(pRet)->m_pPrev;
 
@@ -251,18 +250,16 @@ public:
 		return pRet;
 	}
 
-#define ZLIST_INVALID_INDEX -1
-
 	int IndexOf(const T* pos)
 	{
 		T* pHead = this->m_pHead;
-		int nRet = 0;
+		int nIdx = 0;
 
 		if (!pHead) return ZLIST_INVALID_INDEX;
 
 		while (pHead != pos)
 		{
-			nRet += 1;
+			nIdx += 1;
 
 			ZRefCountedDummy<T>* pNode = this->CastNode(pHead);
 
@@ -275,7 +272,7 @@ public:
 
 		if (!pHead) return ZLIST_INVALID_INDEX;
 
-		return nRet;
+		return nIdx;
 	}
 
 	/// <summary>

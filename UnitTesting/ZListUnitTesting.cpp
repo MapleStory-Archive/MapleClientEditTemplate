@@ -202,7 +202,9 @@ namespace CommonUnitTesting
 			}
 
 			Assert::AreEqual(10, *list.FindIndex(0));
-			Assert::AreEqual(20, *list.FindIndex(2));
+			Assert::AreEqual(30, *list.FindIndex(2));
+			Assert::AreEqual(40, *list.FindIndex(3));
+			Assert::AreEqual(50, *list.FindIndex(4));
 			Assert::AreEqual((int*)nullptr, list.FindIndex(5));
 		}
 
