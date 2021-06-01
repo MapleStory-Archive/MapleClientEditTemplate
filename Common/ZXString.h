@@ -137,7 +137,7 @@ public:
 	/// <param name="s">T-size char array to append to the ZXString object.</param>
 	ZXString<T>* operator+=(const T* s)
 	{
-		return  s ? this->Concat(s, this->TStrLen(s)) : this;
+		return s ? this->Concat(s, this->TStrLen(s)) : this;
 	}
 
 	/// <summary>
@@ -171,9 +171,7 @@ public:
 
 	BOOL operator!=(const T* s)
 	{
-		{
-			return !this->Compare(s);
-		}
+		return !this->Compare(s);
 	}
 
 	/// <summary>

@@ -1,11 +1,6 @@
 #pragma once
 #include "logger.h"
-#include "ZRefCountedDummy.h"
 #include "ZRecyclableAvBuffer.h"
-
-/* forward declarations for compiler serenity */
-template <class T> class ZRecyclableAvBuffer;
-template <class T> class ZRefCountedDummy;
 
 template <typename Type, size_t Size, typename Value>
 class ZRecyclable : protected ZAllocBase
