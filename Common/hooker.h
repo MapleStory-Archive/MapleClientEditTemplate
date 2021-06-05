@@ -28,3 +28,4 @@ retType callConv funcName(__VA_ARGS__);
 
 extern BOOL SetHook(bool bInstall, void** ppvTarget, void* pvDetour);
 extern DWORD GetFuncAddress(const char* lpModule, const char* lpFunc);
+extern PVOID HookVTableFunction(void* pVTable, void* fnHookFunc, int nOffset);
