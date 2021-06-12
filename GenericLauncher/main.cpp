@@ -97,14 +97,12 @@ int main()
 		}
 #endif
 
-#if MAPLE_UNSUSPEND
 		DWORD dwRet = ResumeThread(piMaple.hThread);
 
 		if (dwRet == -1)
 		{
 			ErrorBoxWithCode("Unable to resume thread.");
 		}
-#endif
 
 #if !MAPLE_INJECT_USE_IJL
 		// close handle for injected dll
