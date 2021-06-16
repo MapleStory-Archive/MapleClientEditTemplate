@@ -250,7 +250,7 @@ public:
 		return pRet;
 	}
 
-	int IndexOf(const T* pos)
+	int IndexOf(T* pos)
 	{
 		T* pHead = this->m_pHead;
 		int nIdx = 0;
@@ -280,7 +280,7 @@ public:
 	/// If posAfter is defined, the function will only search for items after the given posAfter item.
 	/// If posAfter is defined but is not a list node, undefined behavior will occur.
 	/// </summary>
-	T* Find(const T* d, T* posAfter)
+	T* Find(T* d, T* posAfter)
 	{
 		T* pRet;
 		if (posAfter)
