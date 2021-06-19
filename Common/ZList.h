@@ -22,16 +22,18 @@ public:
 
 	ZList()
 	{
-		m_uCount = 0;
-		m_pHead = nullptr;
-		m_pTail = nullptr;
+		this->gap4[0] = 0;
+		this->m_uCount = 0;
+		this->m_pHead = nullptr;
+		this->m_pTail = nullptr;
 	}
 
 	ZList(ZList<T>* l)
 	{
-		m_uCount = 0;
-		m_pHead = nullptr;
-		m_pTail = nullptr;
+		this->gap4[0] = 0;
+		this->m_uCount = 0;
+		this->m_pHead = nullptr;
+		this->m_pTail = nullptr;
 
 		this->RemoveAll();
 		this->AddTail(l);
@@ -250,7 +252,7 @@ public:
 		return pRet;
 	}
 
-	int IndexOf(T* pos)
+	int IndexOf(const T* pos)
 	{
 		T* pHead = this->m_pHead;
 		int nIdx = 0;
@@ -344,7 +346,7 @@ public:
 
 		ZRefCountedDummy<T>* pNode = this->CastNode(pRet);
 
-		*pos = pNode->m_pNext ? &reinterpret_cast<ZRefCountedDummy<T>*>(pNode->m_pNext)->t : nullptr;
+		*pos = pNode->m_pNext ? reinterpret_cast<T*>(&reinterpret_cast<ZRefCountedDummy<T>*>(pNode->m_pNext)->t) : nullptr;
 
 		return pRet;
 	}

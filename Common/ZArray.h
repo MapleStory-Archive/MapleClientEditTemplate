@@ -83,7 +83,7 @@ public:
 
 	T* Insert(T* e, int nIdx = -1)
 	{
-		T* result = this->InsertBefore(e); // TODO
+		T* result = this->InsertBefore(e);
 		*result = *e; // operator= overloading is required to make it function as the PDB does
 		return result;
 	}
@@ -146,6 +146,20 @@ public:
 
 		/* Return pointer to new object */
 		return &this->a[nIdx];
+	}
+
+	void MakeSpace(size_t uNewSize)
+	{
+		size_t uCurSize = this->GetCount();
+
+		if (uNewSize > uCurSize)
+		{
+			while (uCurSize < uNewSize)
+			{
+				uCurSize *= 2;
+			}
+			this->Realloc(uCurSize, FALSE);
+		}
 	}
 
 	void RemoveAt(size_t nIdx)
@@ -262,7 +276,9 @@ public:
 			size_t nMaxIndex = *pAllocationBasePointer - 1;
 
 			/* Call destructor  */
-			this->Destroy(this->a, &this->a[nMaxIndex]);
+			T* start = this->a;
+			T* end = reinterpret_cast<T*>(&this->a[nMaxIndex]);
+			this->Destroy(start, end);
 
 			/* Free array allocation */
 			ZAllocEx<ZAllocAnonSelector>::GetInstance()->Free((void**)pAllocationBasePointer);
@@ -305,80 +321,58 @@ private:
 		this->a = reinterpret_cast<T*>(pAlloc + 1);
 	}
 
-	void Realloc(size_t uNewArraySize, int nMode) // Has an extra arg (ZAllocHelper*) that may be used for memory profiling debug builds
+	void Realloc(size_t u, int nMode)
 	{
-		size_t uCurArraySize, // current number of max items
-			uMaxCountInAllocBlock; // max items that will fit inside of the allocated memory block
-		/* Sometimes the above numbers are not the same because memory blocks are often larger than the requested array size */
+		size_t uCurArraySize = this->GetCount();
+		size_t uAllocationSize;
 
-		uCurArraySize = this->GetCount();
-
-		if (uNewArraySize > uCurArraySize)
+		if (u > uCurArraySize)
 		{
 			if (this->a)
 			{
 				/* Grab size of allocation block -- remember, ZAllocEx encodes this at the head of each block */
-				uMaxCountInAllocBlock = reinterpret_cast<DWORD*>(this->a)[-2];
+				uAllocationSize = reinterpret_cast<DWORD*>(this->a)[-2];
 
-				if (uMaxCountInAllocBlock > INT_MAX) // this means its negative since the datatype is unsigned
+				if (uAllocationSize > INT_MAX) // this means its negative since the datatype is unsigned
 				{
-					uMaxCountInAllocBlock = ~uMaxCountInAllocBlock;
+					uAllocationSize = ~uAllocationSize;
 				}
 
-				/* Determine the real number of array item slots based on the allocation block header */
-				uMaxCountInAllocBlock = (uMaxCountInAllocBlock - 4) / sizeof(T);
+				uAllocationSize -= sizeof(DWORD);
 			}
 			else
 			{
-				uMaxCountInAllocBlock = 0;
+				uAllocationSize = 0;
 			}
 
-			/* If the real size of the existing allocation block fits the desired number of array items, do nothing, else allocate new memory */
-			if (uNewArraySize > uMaxCountInAllocBlock)
+			if (u > uAllocationSize)
 			{
-				/* Allocated new block */
-				PVOID pNewAllocationBase = ZAllocEx<ZAllocAnonSelector>::GetInstance()->Alloc(sizeof(T) * uNewArraySize + sizeof(PVOID));
+				/* Allocate enough space for desired size and the extra storage slot for the size of the array */
+				PVOID pNewAlloc = ZAllocEx<ZAllocAnonSelector>::GetInstance()->Alloc(u + sizeof(DWORD));
 
-				/* Increment allocation base to save a spot for the array size encoding */
-				pNewAllocationBase += 1;
-
-				if ((nMode & 2) == 0)
-				{
-					/* Initialize all objects between the current array size and the increased array size in the new block */
-					this->Construct(&pNewAllocationBase[uCurArraySize], &pNewAllocationBase[uNewArraySize]);
-				}
+				/* set new allocation pointer to the array start location (+1) */
+				pNewAlloc = (PVOID)(reinterpret_cast<DWORD*>(pNewAlloc) + 1);
 
 				if (this->a)
 				{
-					if ((nMode & 1) == 0)
+					/* Copy old array to new array */
+					if ((nMode & 1) == FALSE)
 					{
-						/* Copy existing array items into new allocation */
-						memcpy(pNewAllocationBase, this->a, sizeof(T) * uCurArraySize);
+						memcpy(pNewAlloc, this->a, uCurArraySize);
 					}
 
 					/* Free old memory allocation */
-					void** pCurrentAllocationBase = reinterpret_cast<void**>(this->a) - 1;
+					void** pCurrentAllocationBase = &reinterpret_cast<void**>(this->a)[-1];
 					ZAllocEx<ZAllocAnonSelector>::GetInstance()->Free(pCurrentAllocationBase);
 				}
-				this->a = pNewAllocationBase;
+				this->a = reinterpret_cast<T*>(pNewAlloc);
 			}
-			else if ((nMode & 2) == 0)
-			{
-				/* Initialize all objects between the current array size and the increased array size in the same block */
-				this->Construct(&this->a[uCurArraySize], &this->a[uNewArraySize]);
-			}
-		}
-		else
-		{
-			/* Destroy all objects between the new count and the old count */
-			this->Destroy(&this->a[uNewArraySize], &this->a[uCurArraySize]);
 		}
 
 		if (this->a)
 		{
-			/* Reassign value at array size pointer to match new size */
-			DWORD* pdwArraySize = &reinterpret_cast<DWORD*>(this->a)[-1];
-			*pdwArraySize = uNewArraySize;
+			size_t* pCount = &reinterpret_cast<size_t*>(this->a)[-1];
+			*pCount = u;
 		}
 	}
 

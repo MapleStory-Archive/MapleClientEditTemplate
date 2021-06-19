@@ -224,5 +224,22 @@ namespace CommonUnitTesting
 				Assert::AreEqual(arr1[i].test_number, arr2[i].test_number);
 			}
 		}
+
+		TEST_METHOD(ReallocTesting)
+		{
+			size_t initial_size = sizeof(ZArrayDummyTest) * 10;
+			ZArray<ZArrayDummyTest> arr = ZArray<ZArrayDummyTest>(initial_size);
+
+			size_t uCount = arr.GetCount();
+
+			arr.MakeSpace(initial_size);
+			Assert::AreEqual(uCount, arr.GetCount());
+
+			arr.MakeSpace(initial_size * 2);
+			Assert::AreEqual(uCount * 2, arr.GetCount());
+
+			arr.MakeSpace(initial_size * 3);
+			Assert::AreEqual(uCount * 4, arr.GetCount()); // *4 cuz size is always doubled
+		}
 	};
 }
