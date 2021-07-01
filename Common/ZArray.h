@@ -67,11 +67,15 @@ public:
 			}
 		}
 
-
 		return this;
 	}
 
 	T& operator[](size_t i)
+	{
+		return this->a[i];
+	}
+
+	T& GetAt(size_t i)
 	{
 		return this->a[i];
 	}
@@ -83,7 +87,7 @@ public:
 
 	T* Insert(T* e, int nIdx = -1)
 	{
-		T* result = this->InsertBefore(e);
+		T* result = this->InsertBefore(nIdx);
 		*result = *e; // operator= overloading is required to make it function as the PDB does
 		return result;
 	}
@@ -151,6 +155,8 @@ public:
 	void MakeSpace(size_t uNewSize)
 	{
 		size_t uCurSize = this->GetCount();
+
+		if (uCurSize == 0) uCurSize = 1;
 
 		if (uNewSize > uCurSize)
 		{
@@ -255,13 +261,18 @@ public:
 	{
 		if (this->a)
 		{
-			size_t nCount = reinterpret_cast<size_t*>(this->a)[-1];
-			return &this->a[nCount - 1];
+			size_t nIdx = reinterpret_cast<size_t*>(this->a)[-1] - 1;
+			return &this->a[nIdx];
 		}
 		else
 		{
 			return nullptr;
 		}
+	}
+
+	T* GetTailPosition()
+	{
+		return this->a;
 	}
 
 	/// <summary>
@@ -281,7 +292,7 @@ public:
 			this->Destroy(start, end);
 
 			/* Free array allocation */
-			ZAllocEx<ZAllocAnonSelector>::GetInstance()->Free((void**)pAllocationBasePointer);
+			delete pAllocationBasePointer;
 			this->a = nullptr;
 		}
 	}
@@ -318,7 +329,8 @@ private:
 
 		/* Assign start of real allocated block to array pointer */
 		/* We take index 1 because index zero is the array item count */
-		this->a = reinterpret_cast<T*>(pAlloc + 1);
+		pAlloc += 1;
+		this->a = reinterpret_cast<T*>(pAlloc);
 	}
 
 	void Realloc(size_t u, int nMode)
@@ -363,7 +375,8 @@ private:
 
 					/* Free old memory allocation */
 					void** pCurrentAllocationBase = &reinterpret_cast<void**>(this->a)[-1];
-					ZAllocEx<ZAllocAnonSelector>::GetInstance()->Free(pCurrentAllocationBase);
+					delete pCurrentAllocationBase;
+					//ZAllocEx<ZAllocAnonSelector>::GetInstance()->Free(pCurrentAllocationBase);
 				}
 				this->a = reinterpret_cast<T*>(pNewAlloc);
 			}
@@ -420,7 +433,8 @@ private:
 
 			/* Free old memory allocation */
 			void** pCurrentAllocationBase = &reinterpret_cast<void**>(this->a)[-1];
-			ZAllocEx<ZAllocAnonSelector>::GetInstance()->Free(pCurrentAllocationBase);
+			delete pCurrentAllocationBase;
+			//ZAllocEx<ZAllocAnonSelector>::GetInstance()->Free(pCurrentAllocationBase);
 		}
 
 		this->a = reinterpret_cast<T*>(pNewAllocationBase);

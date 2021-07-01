@@ -7,35 +7,82 @@ class ZMap
 public:
 	struct _PAIR : ZRecyclable<ZMap<T, U, V>::_PAIR, int, ZMap<T, U, V>::_PAIR>
 	{
-	private:
-		char aPad[0x4]; // vfptr
-	public:
 		ZMap<T, U, V>::_PAIR* pNext;
 		T key;
 		U value;
+
+		_PAIR(T key, _PAIR* pNext)
+		{
+			this->pNext = pNext;
+			this->key = key;
+			this->value = U();
+		}
 	};
 
 private:
-	char aPad[0x4];
+	_PAIR** m_apTable;
+	size_t m_uTableSize;
+	size_t m_uCount;
+	size_t m_uAutoGrowEvery128;
+	size_t m_uAutoGrowLimit;
 
-public:
-	//ZMap<T, U, V>Vtbl* vfptr;
-	ZMap<T, U, V>::_PAIR** _m_apTable;
-	unsigned int _m_uTableSize;
-	unsigned int _m_uCount;
-	unsigned int _m_uAutoGrowEvery128;
-	unsigned int _m_uAutoGrowLimit;
+private:
+	ZMap()
+	{
+		this->m_apTable = nullptr;
+		this->m_uTableSize = 0;
+		this->m_uCount = 0;
+		this->m_uAutoGrowEvery128 = 0;
+		this->m_uAutoGrowLimit = 0;
+	}
+
+	ZMap(size_t uHashTableSize, size_t uAutoGrowEvery128)
+	{
+		this->m_apTable = nullptr;
+		this->m_uTableSize = uHashTableSize;
+		this->m_uCount = 0;
+
+		this->CalcAutoGrow(uAutoGrowEvery128);
+	}
+
+	virtual ~ZMap()
+	{
+		this->RemoveAll();
+	}
+
+	_PAIR* GetHeadPosition()
+	{
+		_PAIR** apTable = this->m_apTable;
+
+		if (!apTable) return nullptr;
+
+		_PAIR** pTableEnd = &apTable[this->m_uTableSize];
+
+		if (apTable >= pTableEnd) return nullptr;
+
+		while (!*apTable)
+		{
+			apTable += 1;
+			if (apTable >= pTableEnd) return nullptr;
+		}
+		return *apTable;
+	}
+
+	_PAIR* GetPos()
+	{
+
+	}
 
 	U* GetAt(const T* key)
 	{
 		ZMap<T, U, V>::_PAIR** v3; // esi
 		ZMap<T, U, V>::_PAIR* v5; // esi
 
-		v3 = this->_m_apTable;
+		v3 = this->m_apTable;
 
 		if (!v3) return 0;
 
-		v5 = v3[_rotr(*key, 5) % this->_m_uTableSize];
+		v5 = v3[_rotr(*key, 5) % this->m_uTableSize];
 
 		if (!v5) return 0;
 
@@ -51,4 +98,49 @@ public:
 
 		return &v5->value;
 	}
+
+	_PAIR* GetNext()
+	{
+
+	}
+
+	_PAIR* Insert()
+	{
+
+	}
+
+	void RemoveAll()
+	{
+
+	}
+
+	BOOL RemoveKey()
+	{
+
+	}
+
+private:
+	void ResizeHashTable(size_t uHashTableSize, size_t uAutoGrowEvery128)
+	{
+
+	}
+
+	void CalcAutoGrow(size_t uAutoGrowEvery128)
+	{
+		if (uAutoGrowEvery128)
+		{
+			this->m_uAutoGrowEvery128 = uAutoGrowEvery128;
+		}
+		if (this->m_uAutoGrowEvery128 == -1)
+		{
+			this->m_uAutoGrowLimit = -1;
+		}
+		else
+		{
+			this->m_uAutoGrowLimit = this->m_uAutoGrowEvery128 * this->m_uTableSize >> 7;
+		}
+	}
 };
+
+assert_size(sizeof(ZMap<long, long, long>::_PAIR), 0x10)
+assert_size(sizeof(ZMap<long, long, long>), 0x18)

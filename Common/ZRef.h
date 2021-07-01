@@ -53,7 +53,7 @@ public:
 
 		if (r->p)
 		{
-			ZRefCounted* pBase = r->GetBase();
+			pBase = r->GetBase();
 
 			InterlockedIncrement(&pBase->m_nRef); // (this->p - 12)
 		}
@@ -93,19 +93,15 @@ public:
 	/// </summary>
 	ZRef<T>* operator=(ZRefCounted* pT)
 	{
+		ZRef<ZRefCounted> r;
 		if (pT)
 		{
 			InterlockedIncrement(&pT->m_nRef);
 		}
 
-		this->p = pT;
-
-		if (this->p && !InterlockedDecrement(&this->m_nRef))
-		{
-			InterlockedIncrement(&this->m_nRef);
-
-			delete p; // v3->vfptr->__vecDelDtor(v3, 1u);
-		}
+		T* old = this->p;
+		this->p = reinterpret_cast<T*>(pT);
+		r.p = old; // resources are automatically freed by compiler-generated destructor
 
 		return this;
 	}
@@ -119,7 +115,7 @@ public:
 
 		if (r->p)
 		{
-			ZRefCounted* pBase = r->GetBase();
+			pBase = r->GetBase();
 			InterlockedIncrement(&pBase->m_nRef);
 		}
 
@@ -177,7 +173,7 @@ private:
 		{
 			InterlockedIncrement(&pBase->m_nRef);
 
- 			delete pBase; // if (v3) (**v3)(v3, 1);
+			delete pBase; // if (v3) (**v3)(v3, 1);
 		}
 
 		this->p = nullptr;
@@ -191,7 +187,7 @@ private:
 		ZRefCounted* pBase;
 
 		/* is_base_of was released in c++11, so maple did this some other way */
-		if (std::is_base_of<ZRefCounted, T>())
+		if (std::is_base_of<ZRefCounted, T>() || typeid(ZRefCounted) == typeid(T))
 		{
 			pBase = reinterpret_cast<ZRefCounted*>(this->p);
 		}

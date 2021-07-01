@@ -64,6 +64,22 @@ namespace CommonUnitTesting
 			Assert::IsTrue(arr.GetCount() == 10);
 		}
 
+		TEST_METHOD(GetHeadTesting)
+		{
+			ZArray<int> arr = ZArray<int>(2);
+
+			arr[0] = 10;
+			arr[1] = 20;
+
+			auto pHead = arr.GetHeadPosition();
+			Assert::AreEqual(20, *pHead);
+
+			arr.RemoveAt(pHead);
+
+			pHead = arr.GetHeadPosition();
+			Assert::AreEqual(10, *pHead);
+		}
+
 		TEST_METHOD(SubscriptOperatorTesting)
 		{
 			ZArray<int> arr = ZArray<int>(10);
@@ -86,6 +102,7 @@ namespace CommonUnitTesting
 			for (int i = 0; i < arr.GetCount(); i++)
 			{
 				arr[i] = i * 10;
+				Assert::AreEqual(i * 10, arr[i]);
 			}
 
 			PINT pHead = arr.GetHeadPosition();
@@ -123,85 +140,13 @@ namespace CommonUnitTesting
 
 		TEST_METHOD(InsertRemoveTesting)
 		{
-			ZArray<SizeTest10> arr1 = ZArray<SizeTest10>();
-			ZArray<SizeTest20> arr2 = ZArray<SizeTest20>();
-			ZArray<SizeTest40> arr3 = ZArray<SizeTest40>();
-			ZArray<SizeTest80> arr4 = ZArray<SizeTest80>();
-			ZArray<SizeTest160> arr5 = ZArray<SizeTest160>();
-			ZArray<SizeTest320> arr6 = ZArray<SizeTest320>();
+			ZArray<ZArrayDummyTest> arr = ZArray<ZArrayDummyTest>();
 
-			for (int i = 0; i < 250; i++)
+			for (int i = 0; i < 10; i++)
 			{
-				size_t aSizes[6] = { 0 };
-
-				for (int j = 0; j < 50000; j++)
-				{
-					int nRand = rand() % 6;
-					aSizes[nRand] += 1;
-					switch (nRand)
-					{
-					case 0:
-						arr1.InsertBefore();
-						break;
-					case 1:
-						arr2.InsertBefore();
-						break;
-					case 2:
-						arr3.InsertBefore();
-						break;
-					case 3:
-						arr4.InsertBefore();
-						break;
-					case 4:
-						arr5.InsertBefore();
-						break;
-					case 5:
-						arr6.InsertBefore();
-						break;
-					}
-				}
-
-				/* Verify array size is correct */
-				Assert::AreEqual(aSizes[0], arr1.GetCount());
-				Assert::AreEqual(aSizes[1], arr2.GetCount());
-				Assert::AreEqual(aSizes[2], arr3.GetCount());
-				Assert::AreEqual(aSizes[3], arr4.GetCount());
-				Assert::AreEqual(aSizes[4], arr5.GetCount());
-				Assert::AreEqual(aSizes[5], arr6.GetCount());
-
-				/* Remove items one at a time */
-				while (arr1.GetCount())
-				{
-					arr1.RemoveAt(arr1.GetCount() - 1);
-				}
-				while (arr2.GetCount())
-				{
-					arr2.RemoveAt(arr2.GetCount() - 1);
-				}
-				while (arr3.GetCount())
-				{
-					arr3.RemoveAt(arr3.GetCount() - 1);
-				}
-				while (arr4.GetCount())
-				{
-					arr4.RemoveAt(arr4.GetCount() - 1);
-				}
-				while (arr5.GetCount())
-				{
-					arr5.RemoveAt(arr5.GetCount() - 1);
-				}
-				while (arr6.GetCount())
-				{
-					arr6.RemoveAt(arr6.GetCount() - 1);
-				}
-
-				/* Verify array size is correct */
-				Assert::AreEqual((size_t)0, arr1.GetCount());
-				Assert::AreEqual((size_t)0, arr2.GetCount());
-				Assert::AreEqual((size_t)0, arr3.GetCount());
-				Assert::AreEqual((size_t)0, arr4.GetCount());
-				Assert::AreEqual((size_t)0, arr5.GetCount());
-				Assert::AreEqual((size_t)0, arr6.GetCount());
+				auto item = arr.InsertBefore();
+				Assert::AreEqual((size_t)i + 1, arr.GetCount());
+				Assert::AreEqual(42, item->test_number);
 			}
 		}
 
@@ -234,7 +179,6 @@ namespace CommonUnitTesting
 
 			arr.MakeSpace(initial_size);
 			Assert::AreEqual(uCount, arr.GetCount());
-
 			arr.MakeSpace(initial_size * 2);
 			Assert::AreEqual(uCount * 2, arr.GetCount());
 

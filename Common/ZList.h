@@ -138,7 +138,7 @@ public:
 		return pNewTail;
 	}
 
-	T* AddTail(ZList<T>* l) // TODO test this, currently untested and prolly not working
+	void AddTail(ZList<T>* l) // TODO test this, currently untested and prolly not working
 	{
 		T* pHead = l->m_pHead;
 
@@ -149,7 +149,7 @@ public:
 			ZRefCountedDummy<T>* pNode = this->CastNode(pHead);
 			ZRefCountedDummy<T>* pNodePrev = reinterpret_cast<ZRefCountedDummy<T>*>(pNode->m_pPrev);
 
-			pHead = pNodePrev ? pNodePrev->t : nullptr;
+			pHead = pNodePrev ? &pNodePrev->t : reinterpret_cast<T*>(nullptr);
 
 			T* pNew = this->AddTail();
 			*pNew = *pNext;
